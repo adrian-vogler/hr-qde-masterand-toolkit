@@ -1,0 +1,65 @@
+@startuml shape-supply
+'==============================================================
+' HR-QDE Shape — Säule B (Köppe) · Supply-Profile
+' Visualisierung der Klassen-Struktur und Cardinalities
+' Version 0.1 · 2026-05-11
+'==============================================================
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam classBackgroundColor #E8F4F8
+skinparam classBorderColor #2E6E8E
+skinparam noteBackgroundColor #FFF9E6
+skinparam noteBorderColor #B8860B
+skinparam arrowColor #444444
+skinparam linetype ortho
+
+title **Säule B — Supply-Profile**\n//Lieferung von Köppe — grundständige Lehre//
+
+class HigherEducationInstitution {
+  + label             : string
+  + institutionType   : URI {opt}
+}
+
+class EducationalModule {
+  + moduleCode        : string
+  + label             : string
+  + ects              : decimal (>0)
+}
+
+class LearningOutcome {
+  + provenanceConfidence : decimal [0.0–1.0]
+  + provenanceSource     : string {opt}
+}
+
+class "ESCO Skill" as ESCOSkill <<external>> #FFE4E1 {
+  + uri : http://data.europa.eu/esco/skill/...
+}
+
+class "ProficiencyLevel" as DQR <<external>> #FFE4E1 {
+  + uri : http://hr-qde.org/ontology/DQR1..8
+}
+
+EducationalModule "*" --> "1" HigherEducationInstitution : offeredBy
+EducationalModule "1" --> "1..*" LearningOutcome : hasOutcome
+EducationalModule "1" --> "0..*" ESCOSkill : requiresCompetence\n(Voraussetzungen)
+LearningOutcome "1" --> "1" ESCOSkill : targetsCompetence
+LearningOutcome "1" --> "1" DQR : targetLevel
+
+note bottom of LearningOutcome
+  **Option A:**
+  Genau **ein** ESCO-Skill und **ein**
+  Ziel-ProficiencyLevel pro Lernergebnis.
+end note
+
+note top of EducationalModule
+  **Inhaltlicher Scope:**
+  Module aus akkreditierten Bachelor- und
+  Masterstudiengängen deutscher Hochschulen
+  (//grundständige Lehre// im HR-QDE-Sinne).
+  Diese inhaltliche Beschränkung ist Teil
+  der Spec, **nicht** der SHACL-Validierung.
+end note
+
+@enduml

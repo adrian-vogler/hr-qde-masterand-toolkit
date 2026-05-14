@@ -1,0 +1,638 @@
+# =====================================================================
+# HR-QDE Skeleton Ontology
+# Version 0.1  ·  2026-05-11
+#
+# Defines the five clusters of the consolidated HR-QDE Domain Ontology
+# as developed in Vogler (in prep.), Chapter 3, Section 3.4.4.
+#
+# Author:    Adrian Vogler (FernUniversität in Hagen)
+# Reference: HR-QDE Architecture Briefing §2-3
+# License:   CC-BY-SA 4.0
+#
+# This file is the upper-level skeleton: it defines the HR-QDE-internal
+# classes, properties, and bridging axioms.  It references ESCO concepts
+# by URI without including the full ESCO classification (the ESCO bulk
+# import is a separate build step). A small set of example ESCO skills
+# is included at the end of this file for smoke-testing purposes only;
+# these will be subsumed by the full ESCO import.
+#
+# Build-time consistency: verified with HermiT (see reasoner-report).
+# Run-time consistency:   enforced via SHACL shapes in hrqde-shapes.ttl
+#                         and SPARQL/Cypher queries (no run-time OWL
+#                         reasoner deployed).
+# =====================================================================
+
+@prefix hrqde:    <http://hr-qde.org/ontology/> .
+@prefix esco:     <http://data.europa.eu/esco/skill/> .
+@prefix escoO:    <http://data.europa.eu/esco/occupation/> .
+@prefix escoM:    <http://data.europa.eu/esco/model#> .
+@prefix eqf:      <http://data.europa.eu/snb/qf-eu-level/> .
+
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+
+
+# =====================================================================
+# Ontology metadata
+# =====================================================================
+
+<http://hr-qde.org/ontology/>
+  a                  owl:Ontology ;
+  dcterms:title      "HR-QDE Domain Ontology (Skeleton)"@en ,
+                     "HR-QDE-Domänenontologie (Skelett)"@de ;
+  dcterms:creator    "Adrian Vogler" ;
+  dcterms:issued     "2026-05-11"^^xsd:date ;
+  dcterms:license    <https://creativecommons.org/licenses/by-sa/4.0/> ;
+  owl:versionInfo    "0.1" ;
+  rdfs:comment       "Skeleton of the consolidated HR-QDE Domain Ontology, defining the five entity clusters (Competence and Qualification, Demand-Side, Supply-Side, Learner Profile, Development Plan) and the two bridging axioms (Supply Bridge, Competence Bridge) that integrate the static and process-oriented clusters."@en ,
+                     "Skelett der konsolidierten HR-QDE-Domänenontologie. Definiert die fünf Entitätscluster (Kompetenz und Qualifikation, Nachfrageseite, Angebotsseite, Lernerprofil, Entwicklungsplan) sowie die beiden Brücken-Axiome (Supply Bridge, Competence Bridge), die die statischen und prozessorientierten Cluster integrieren."@de .
+
+
+# =====================================================================
+# CLUSTER 1: Competence and Qualification
+# ESCO as upper vocabulary (§3.4.4 Consolidation Semantics)
+# =====================================================================
+
+hrqde:Competence
+  a                 owl:Class ;
+  rdfs:label        "Competence"@en , "Kompetenz"@de ;
+  rdfs:comment      "A demonstrable ability to apply knowledge and skills to achieve observable results. Anchored in ESCO as the upper vocabulary; subclasses may further specialise into domain- or proficiency-specific notions."@en ,
+                    "Eine nachweisbare Fähigkeit, Wissen und Fertigkeiten zur Erzielung beobachtbarer Ergebnisse anzuwenden. In ESCO als Oberbegriff verankert."@de ;
+  rdfs:subClassOf   skos:Concept .
+
+hrqde:Knowledge
+  a                 owl:Class ;
+  rdfs:label        "Knowledge"@en , "Wissen"@de ;
+  rdfs:comment      "Factual or conceptual content acquired through education or experience. Distinct from Competence in the ESCO three-pillar model: knowledge concepts describe what someone knows, competences describe what someone can do."@en ;
+  rdfs:subClassOf   skos:Concept .
+
+hrqde:Qualification
+  a                 owl:Class ;
+  rdfs:label        "Qualification"@en , "Qualifikation"@de ;
+  rdfs:comment      "A formal outcome of an assessment and validation process, awarded by a competent authority. Examples: a Bachelor degree, a certified course completion, an IHK certificate. References the EQF/DQR proficiency levels."@en ;
+  rdfs:subClassOf   skos:Concept .
+
+hrqde:ProficiencyLevel
+  a                 owl:Class ;
+  rdfs:label        "Proficiency Level"@en , "Kompetenzstufe"@de ;
+  rdfs:comment      "A discrete level on a controlled proficiency framework (DQR/EQF levels 1-8). Specific levels are declared as instances below."@en ;
+  rdfs:subClassOf   skos:Concept .
+
+
+# =====================================================================
+# CLUSTER 2: Demand-Side
+# Job postings and qualification requirements
+# =====================================================================
+
+hrqde:JobPosting
+  a                 owl:Class ;
+  rdfs:label        "Job Posting"@en , "Stellenausschreibung"@de ;
+  rdfs:comment      "A published job advertisement issued by an employer, expressing demand for qualified candidates. Aggregates QualificationRequirement instances."@en .
+
+hrqde:QualificationRequirement
+  a                 owl:Class ;
+  rdfs:label        "Qualification Requirement"@en , "Qualifikationsanforderung"@de ;
+  rdfs:comment      "A specific competence demand of a JobPosting, characterised by a referenced Competence and a required ProficiencyLevel."@en .
+
+hrqde:Occupation
+  a                 owl:Class ;
+  rdfs:label        "Occupation"@en , "Beruf"@de ;
+  rdfs:comment      "An occupational profile such as 'Data Scientist' or 'Software Engineer'. Anchored in ESCO's occupation pillar (ISCO-based hierarchy)."@en ;
+  rdfs:subClassOf   skos:Concept .
+
+hrqde:Employer
+  a                 owl:Class ;
+  rdfs:label        "Employer"@en , "Arbeitgeber"@de ;
+  rdfs:comment      "The organisation that issues a JobPosting. May be commercial, public-sector, or non-profit."@en .
+
+
+# Object Properties — Demand-Side
+
+hrqde:hasRequirement
+  a                 owl:ObjectProperty ;
+  rdfs:label        "has requirement"@en , "hat Anforderung"@de ;
+  rdfs:domain       hrqde:JobPosting ;
+  rdfs:range        hrqde:QualificationRequirement .
+
+hrqde:refersToCompetence
+  a                 owl:ObjectProperty ;
+  rdfs:label        "refers to competence"@en , "verweist auf Kompetenz"@de ;
+  rdfs:domain       hrqde:QualificationRequirement ;
+  rdfs:range        hrqde:Competence .
+
+hrqde:refersToOccupation
+  a                 owl:ObjectProperty ;
+  rdfs:label        "refers to occupation"@en , "verweist auf Beruf"@de ;
+  rdfs:domain       hrqde:JobPosting ;
+  rdfs:range        hrqde:Occupation .
+
+hrqde:issuedBy
+  a                 owl:ObjectProperty ;
+  rdfs:label        "issued by"@en , "ausgestellt von"@de ;
+  rdfs:domain       hrqde:JobPosting ;
+  rdfs:range        hrqde:Employer .
+
+hrqde:requiredLevel
+  a                 owl:ObjectProperty ;
+  rdfs:label        "required level"@en , "erforderliche Stufe"@de ;
+  rdfs:domain       hrqde:QualificationRequirement ;
+  rdfs:range        hrqde:ProficiencyLevel .
+
+
+# Data Properties — Demand-Side
+
+hrqde:requirementKind
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "requirement kind"@en , "Anforderungsart"@de ;
+  rdfs:comment      "Marks a requirement as 'must' or 'nice-to-have'."@en ;
+  rdfs:domain       hrqde:QualificationRequirement ;
+  rdfs:range        xsd:string .
+
+hrqde:postingDate
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "posting date"@en , "Datum"@de ;
+  rdfs:domain       hrqde:JobPosting ;
+  rdfs:range        xsd:date .
+
+
+# =====================================================================
+# CLUSTER 3: Supply-Side
+# Educational modules and learning outcomes
+# =====================================================================
+
+hrqde:EducationalModule
+  a                 owl:Class ;
+  rdfs:label        "Educational Module"@en , "Lehrmodul"@de ;
+  rdfs:comment      "A bookable course or unit offered by a Higher Education Institution. Aggregates LearningOutcome instances. May declare prerequisite competences."@en .
+
+hrqde:LearningOutcome
+  a                 owl:Class ;
+  rdfs:label        "Learning Outcome"@en , "Lernergebnis"@de ;
+  rdfs:comment      "A statement of what a learner is expected to know, understand, or be able to do after completion of an EducationalModule. Targets one or more Competence concepts at a given ProficiencyLevel."@en .
+
+hrqde:StudyProgramme
+  a                 owl:Class ;
+  rdfs:label        "Study Programme"@en , "Studiengang"@de ;
+  rdfs:comment      "An ordered collection of EducationalModule instances leading to a Qualification. Examples: BSc Computer Science, MSc Data Science."@en .
+
+hrqde:HigherEducationInstitution
+  a                 owl:Class ;
+  rdfs:label        "Higher Education Institution"@en , "Hochschule"@de ;
+  rdfs:comment      "An accredited institution that offers EducationalModule instances. Includes universities, universities of applied sciences (FH/HAW), and accredited continuing-education academies."@en .
+
+
+# Object Properties — Supply-Side
+
+hrqde:hasOutcome
+  a                 owl:ObjectProperty ;
+  rdfs:label        "has outcome"@en , "hat Lernergebnis"@de ;
+  rdfs:domain       hrqde:EducationalModule ;
+  rdfs:range        hrqde:LearningOutcome .
+
+hrqde:targetsCompetence
+  a                 owl:ObjectProperty ;
+  rdfs:label        "targets competence"@en , "zielt auf Kompetenz"@de ;
+  rdfs:domain       hrqde:LearningOutcome ;
+  rdfs:range        hrqde:Competence .
+
+hrqde:targetLevel
+  a                 owl:ObjectProperty ;
+  rdfs:label        "target level"@en , "Zielstufe"@de ;
+  rdfs:domain       hrqde:LearningOutcome ;
+  rdfs:range        hrqde:ProficiencyLevel .
+
+hrqde:requiresCompetence
+  a                 owl:ObjectProperty ;
+  rdfs:label        "requires competence (as prerequisite)"@en , "setzt Kompetenz voraus"@de ;
+  rdfs:domain       hrqde:EducationalModule ;
+  rdfs:range        hrqde:Competence ;
+  rdfs:comment      "A competence that must be present before the EducationalModule can be taken."@en .
+
+hrqde:offeredBy
+  a                 owl:ObjectProperty ;
+  rdfs:label        "offered by"@en , "angeboten von"@de ;
+  rdfs:domain       hrqde:EducationalModule ;
+  rdfs:range        hrqde:HigherEducationInstitution .
+
+hrqde:partOfProgramme
+  a                 owl:ObjectProperty ;
+  rdfs:label        "part of programme"@en , "Teil von Studiengang"@de ;
+  rdfs:domain       hrqde:EducationalModule ;
+  rdfs:range        hrqde:StudyProgramme .
+
+
+# Data Properties — Supply-Side
+
+hrqde:moduleCode
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "module code"@en , "Modulkennzeichen"@de ;
+  rdfs:domain       hrqde:EducationalModule ;
+  rdfs:range        xsd:string .
+
+hrqde:ects
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "ECTS credits"@en , "ECTS-Punkte"@de ;
+  rdfs:domain       hrqde:EducationalModule ;
+  rdfs:range        xsd:decimal .
+
+
+# =====================================================================
+# CLUSTER 4: Learner Profile
+# As-Is state of a learner
+# =====================================================================
+
+hrqde:Learner
+  a                 owl:Class ;
+  rdfs:label        "Learner"@en , "Lerner"@de ;
+  rdfs:comment      "An individual whose competency profile is captured by the HR-QDE for the purpose of qualification path computation. Includes students, applicants, and continuing-education participants."@en .
+
+hrqde:CompetencyProfile
+  a                 owl:Class ;
+  rdfs:label        "Competency Profile"@en , "Kompetenzprofil"@de ;
+  rdfs:comment      "The aggregated set of AcquiredCompetence instances representing a Learner's current state (As-Is). Time-stamped to mark the assessment moment."@en .
+
+hrqde:AcquiredCompetence
+  a                 owl:Class ;
+  rdfs:label        "Acquired Competence"@en , "Erworbene Kompetenz"@de ;
+  rdfs:comment      "A specific Competence held by the Learner, with provenance attributes recording the source document (CV, transcript, certificate) and extraction confidence."@en .
+
+
+# Object Properties — Learner Profile
+
+hrqde:hasProfile
+  a                 owl:ObjectProperty ;
+  rdfs:label        "has profile"@en , "hat Profil"@de ;
+  rdfs:domain       hrqde:Learner ;
+  rdfs:range        hrqde:CompetencyProfile .
+
+hrqde:containsCompetence
+  a                 owl:ObjectProperty ;
+  rdfs:label        "contains competence"@en , "enthält Kompetenz"@de ;
+  rdfs:domain       hrqde:CompetencyProfile ;
+  rdfs:range        hrqde:AcquiredCompetence .
+
+hrqde:acquiredCompetenceOf
+  a                 owl:ObjectProperty ;
+  rdfs:label        "is acquired competence of"@en , "ist erworbene Kompetenz von"@de ;
+  rdfs:domain       hrqde:AcquiredCompetence ;
+  rdfs:range        hrqde:Competence ;
+  rdfs:comment      "Links the AcquiredCompetence to the Competence concept in the upper vocabulary (ESCO via Competence). Critical for taxonomic resolution in the Gap Analyzer."@en .
+
+hrqde:hasProficiencyLevel
+  a                 owl:ObjectProperty ;
+  rdfs:label        "has proficiency level"@en , "hat Kompetenzstufe"@de ;
+  rdfs:domain       hrqde:AcquiredCompetence ;
+  rdfs:range        hrqde:ProficiencyLevel .
+
+
+# Data Properties — Learner Profile
+
+hrqde:provenanceSource
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "provenance source"@en , "Herkunftsquelle"@de ;
+  rdfs:comment      "Source document type that established the AcquiredCompetence: cv, transcript, certificate, reference, self_declaration."@en ;
+  rdfs:domain       hrqde:AcquiredCompetence ;
+  rdfs:range        xsd:string .
+
+hrqde:provenanceConfidence
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "provenance confidence"@en , "Konfidenz"@de ;
+  rdfs:comment      "Extraction-pipeline confidence for the AcquiredCompetence, in [0.0, 1.0]. Conservative aggregate across multiple source documents if applicable."@en ;
+  rdfs:domain       hrqde:AcquiredCompetence ;
+  rdfs:range        xsd:decimal .
+
+hrqde:acquiredOn
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "acquired on"@en , "erworben am"@de ;
+  rdfs:domain       hrqde:AcquiredCompetence ;
+  rdfs:range        xsd:date .
+
+
+# =====================================================================
+# CLUSTER 5: Development Plan (Process-Oriented Extension)
+# Adapted from FPHR [Vogler 2018, 2020], §3.5.2 of the dissertation
+# =====================================================================
+
+hrqde:DevelopmentPlan
+  a                 owl:Class ;
+  rdfs:label        "Development Plan"@en , "Entwicklungsplan"@de ;
+  rdfs:comment      "Root of the process-oriented extension. Created once per path-computation request. References the Learner, the addressed QualificationRequirement, and the identified CompetencyGap instances."@en .
+
+hrqde:QualificationPath
+  a                 owl:Class ;
+  rdfs:label        "Qualification Path"@en , "Qualifizierungspfad"@de ;
+  rdfs:comment      "Proposed solution to a DevelopmentPlan: an ordered sequence of PathStep instances that, taken together, close the identified gaps."@en .
+
+hrqde:PathStep
+  a                 owl:Class ;
+  rdfs:label        "Path Step"@en , "Pfadschritt"@de ;
+  rdfs:comment      "The atomic unit of transformation. Executes exactly one RecommendedModule, consumes zero or more Prerequisite instances, and yields one or more CompetencyGain instances. Its position in the path is given by stepOrder."@en .
+
+hrqde:CompetencyGain
+  a                 owl:Class ;
+  rdfs:label        "Competency Gain"@en , "Kompetenzgewinn"@de ;
+  rdfs:comment      "The competence that a PathStep produces. Carries a reference (via the Competence Bridge) to the ESCO concept yielded and the proficiency level attained."@en .
+
+hrqde:Prerequisite
+  a                 owl:Class ;
+  rdfs:label        "Prerequisite"@en , "Voraussetzung"@de ;
+  rdfs:comment      "A competence that a PathStep requires before it can be executed. Carries a reference (via the Competence Bridge) to the ESCO concept required and the minimum proficiency level expected."@en .
+
+hrqde:CompetencyGap
+  a                 owl:Class ;
+  rdfs:label        "Competency Gap"@en , "Kompetenzlücke"@de ;
+  rdfs:comment      "A competence that the Learner is missing relative to the target QualificationRequirement. Identified by the Gap Analyzer (RG2.1-T) and consumed as input by the Hybrid Path Planner (RG2.2-T)."@en .
+
+hrqde:RecommendedModule
+  a                 owl:Class ;
+  rdfs:label        "Recommended Module"@en , "Empfohlenes Modul"@de ;
+  rdfs:comment      "The instance-level reference by which a PathStep is anchored in a concrete EducationalModule of the Supply-Side Cluster. Subject to the Supply Bridge axiom."@en .
+
+
+# Object Properties — Development Plan
+
+hrqde:planFor
+  a                 owl:ObjectProperty ;
+  rdfs:label        "plan for"@en , "Plan für"@de ;
+  rdfs:domain       hrqde:DevelopmentPlan ;
+  rdfs:range        hrqde:Learner .
+
+hrqde:addressesRequirement
+  a                 owl:ObjectProperty ;
+  rdfs:label        "addresses requirement"@en , "adressiert Anforderung"@de ;
+  rdfs:domain       hrqde:DevelopmentPlan ;
+  rdfs:range        hrqde:QualificationRequirement .
+
+hrqde:identifiesGap
+  a                 owl:ObjectProperty ;
+  rdfs:label        "identifies gap"@en , "identifiziert Lücke"@de ;
+  rdfs:domain       hrqde:DevelopmentPlan ;
+  rdfs:range        hrqde:CompetencyGap .
+
+hrqde:hasPath
+  a                 owl:ObjectProperty ;
+  rdfs:label        "has path"@en , "hat Pfad"@de ;
+  rdfs:domain       hrqde:DevelopmentPlan ;
+  rdfs:range        hrqde:QualificationPath .
+
+hrqde:containsStep
+  a                 owl:ObjectProperty ;
+  rdfs:label        "contains step"@en , "enthält Schritt"@de ;
+  rdfs:domain       hrqde:QualificationPath ;
+  rdfs:range        hrqde:PathStep .
+
+hrqde:executesModule
+  a                 owl:ObjectProperty ;
+  rdfs:label        "executes module"@en , "führt Modul aus"@de ;
+  rdfs:domain       hrqde:PathStep ;
+  rdfs:range        hrqde:RecommendedModule .
+
+hrqde:yieldsGain
+  a                 owl:ObjectProperty ;
+  rdfs:label        "yields gain"@en , "erzeugt Gewinn"@de ;
+  rdfs:domain       hrqde:PathStep ;
+  rdfs:range        hrqde:CompetencyGain .
+
+hrqde:hasPrerequisite
+  a                 owl:ObjectProperty ;
+  rdfs:label        "has prerequisite"@en , "hat Voraussetzung"@de ;
+  rdfs:domain       hrqde:PathStep ;
+  rdfs:range        hrqde:Prerequisite .
+
+hrqde:gapConcept
+  a                 owl:ObjectProperty ;
+  rdfs:label        "gap concept"@en , "Lücken-Konzept"@de ;
+  rdfs:domain       hrqde:CompetencyGap ;
+  rdfs:range        hrqde:Competence ;
+  rdfs:comment      "The Competence that is missing. Foundation of the chain consistency axiom (§3.5.2)."@en .
+
+hrqde:yieldsConcept
+  a                 owl:ObjectProperty ;
+  rdfs:label        "yields concept"@en , "erzeugt Konzept"@de ;
+  rdfs:domain       hrqde:CompetencyGain ;
+  rdfs:range        hrqde:Competence ;
+  rdfs:comment      "Part of the COMPETENCE BRIDGE axiom: a Gain references the same Competence class that an AcquiredCompetence or a downstream Prerequisite references. This shared identity enables mechanical chain-consistency verification (§3.5.2)."@en .
+
+hrqde:requiresConcept
+  a                 owl:ObjectProperty ;
+  rdfs:label        "requires concept"@en , "fordert Konzept"@de ;
+  rdfs:domain       hrqde:Prerequisite ;
+  rdfs:range        hrqde:Competence ;
+  rdfs:comment      "Part of the COMPETENCE BRIDGE axiom: a Prerequisite references a Competence that must be satisfied by an earlier Gain in the chain."@en .
+
+hrqde:instanceOfModule
+  a                 owl:ObjectProperty ;
+  rdfs:label        "instance of module"@en , "Instanz von Modul"@de ;
+  rdfs:domain       hrqde:RecommendedModule ;
+  rdfs:range        hrqde:EducationalModule ;
+  rdfs:comment      "SUPPLY BRIDGE axiom: every RecommendedModule is an instance of exactly one EducationalModule from the Supply-Side Cluster. Guarantees that every computed PathStep is anchored in a concrete, bookable course offered by an HEI (§3.5.2)."@en .
+
+
+# Data Properties — Development Plan
+
+hrqde:stepOrder
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "step order"@en , "Schrittreihenfolge"@de ;
+  rdfs:comment      "Position of the PathStep within its QualificationPath, starting at 1. Foundation of the acyclicity check (§3.5.2)."@en ;
+  rdfs:domain       hrqde:PathStep ;
+  rdfs:range        xsd:positiveInteger .
+
+hrqde:gapMagnitude
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "gap magnitude"@en , "Lückenmaß"@de ;
+  rdfs:comment      "Marks a CompetencyGap as 'complete' (entirely missing) or 'partial' (level deficit only)."@en ;
+  rdfs:domain       hrqde:CompetencyGap ;
+  rdfs:range        xsd:string .
+
+hrqde:minProficiency
+  a                 owl:ObjectProperty ;
+  rdfs:label        "minimum proficiency"@en , "Mindestkompetenzstufe"@de ;
+  rdfs:domain       hrqde:Prerequisite ;
+  rdfs:range        hrqde:ProficiencyLevel .
+
+hrqde:gainProficiency
+  a                 owl:ObjectProperty ;
+  rdfs:label        "gain proficiency"@en , "Gewinn-Kompetenzstufe"@de ;
+  rdfs:domain       hrqde:CompetencyGain ;
+  rdfs:range        hrqde:ProficiencyLevel .
+
+hrqde:planStatus
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "plan status"@en , "Planstatus"@de ;
+  rdfs:comment      "Status of the DevelopmentPlan: draft, verified, or rejected. Advanced from draft to verified by the Chain Consistency Verifier (§3.5.2)."@en ;
+  rdfs:domain       hrqde:DevelopmentPlan ;
+  rdfs:range        xsd:string .
+
+hrqde:planCreatedAt
+  a                 owl:DatatypeProperty ;
+  rdfs:label        "created at"@en , "erstellt am"@de ;
+  rdfs:domain       hrqde:DevelopmentPlan ;
+  rdfs:range        xsd:dateTime .
+
+
+# =====================================================================
+# DQR/EQF PROFICIENCY LEVELS
+# DQR levels 1-8 with skos:exactMatch to the official EQF URIs
+# Anchored in the European Commission's europass linked-data vocabulary
+# =====================================================================
+
+hrqde:DQR1 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 1 / EQF 1"@en , "DQR 1 / EQR 1"@de ;
+  rdfs:comment "Foundational vocational training; basic general knowledge."@en ;
+  skos:notation "1" ;
+  skos:exactMatch eqf:1 .
+
+hrqde:DQR2 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 2 / EQF 2"@en , "DQR 2 / EQR 2"@de ;
+  skos:notation "2" ;
+  skos:exactMatch eqf:2 .
+
+hrqde:DQR3 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 3 / EQF 3"@en , "DQR 3 / EQR 3"@de ;
+  skos:notation "3" ;
+  skos:exactMatch eqf:3 .
+
+hrqde:DQR4 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 4 / EQF 4 (IHK Ausbildung)"@en , "DQR 4 / EQR 4 (IHK-Niveau)"@de ;
+  rdfs:comment "Typical level of a completed vocational training (IHK Berufsausbildung)."@en ;
+  skos:notation "4" ;
+  skos:exactMatch eqf:4 .
+
+hrqde:DQR5 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 5 / EQF 5 (Specialised vocational qualification)"@en , "DQR 5 / EQR 5 (IT-Spezialist)"@de ;
+  skos:notation "5" ;
+  skos:exactMatch eqf:5 .
+
+hrqde:DQR6 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 6 / EQF 6 (Bachelor)"@en , "DQR 6 / EQR 6 (Bachelor)"@de ;
+  rdfs:comment "Bachelor-level degree, or equivalent professional qualification (e.g., IHK Operative Professional)."@en ;
+  skos:notation "6" ;
+  skos:exactMatch eqf:6 .
+
+hrqde:DQR7 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 7 / EQF 7 (Master)"@en , "DQR 7 / EQR 7 (Master)"@de ;
+  rdfs:comment "Master-level degree, or equivalent professional qualification (e.g., IHK Strategic Professional)."@en ;
+  skos:notation "7" ;
+  skos:exactMatch eqf:7 .
+
+hrqde:DQR8 a hrqde:ProficiencyLevel ;
+  rdfs:label "DQR 8 / EQF 8 (Doctorate)"@en , "DQR 8 / EQR 8 (Promotion)"@de ;
+  skos:notation "8" ;
+  skos:exactMatch eqf:8 .
+
+
+# =====================================================================
+# EXAMPLE ESCO SKILLS (smoke-test seed)
+#
+# A small set of computer-science skills with their verified ESCO URIs.
+# Used for smoke-testing the bridging axioms and the Gap Analyzer until
+# the full ESCO classification is imported (separate build step).
+#
+# After the ESCO bulk import, these triples are subsumed by the
+# canonical ESCO resources (they share the same URIs).
+# =====================================================================
+
+# Verified ESCO URIs (sources: esco.ec.europa.eu, esco-skill-extractor)
+
+esco:ccd0a1d9-afda-43d9-b901-96344886e14d
+  a               hrqde:Competence , skos:Concept ;
+  rdfs:label      "Python (computer programming)"@en , "Python (Programmierung)"@de ;
+  skos:prefLabel  "Python (computer programming)"@en .
+
+esco:19a8293b-8e95-4de3-983f-77484079c389
+  a               hrqde:Competence , skos:Concept ;
+  rdfs:label      "Java (computer programming)"@en , "Java (Programmierung)"@de ;
+  skos:prefLabel  "Java (computer programming)"@en .
+
+esco:c062bab3-3ea0-4291-9220-a2d8fef4bead
+  a               hrqde:Competence , skos:Concept ;
+  rdfs:label      "SQL Server"@en , "SQL Server (Microsoft)"@de ;
+  skos:prefLabel  "SQL Server"@en .
+
+esco:ab1e97ed-2319-4293-a8b7-072d2648822f
+  a               hrqde:Competence , skos:Concept ;
+  rdfs:label      "use databases"@en , "Datenbanken nutzen"@de ;
+  skos:prefLabel  "use databases"@en .
+
+esco:6f7512ab-d46d-402a-8c30-a8878d7c1f88
+  a               hrqde:Competence , skos:Concept ;
+  rdfs:label      "SQL Server Integration Services"@en , "SQL Server Integration Services"@de .
+
+# Placeholder URIs to be verified against ESCO v1.2.1 bulk import.
+# These are temporary stand-ins; the URIs above are the canonical pattern.
+# Marked with hrqde:placeholderUri to allow automated identification.
+
+hrqde:placeholderUri
+  a                 owl:AnnotationProperty ;
+  rdfs:comment      "Marks a URI as a placeholder pending verification against the official ESCO release."@en .
+
+hrqde:_skill_machine_learning
+  a               hrqde:Competence ;
+  rdfs:label      "Machine Learning"@en , "Maschinelles Lernen"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_deep_learning
+  a               hrqde:Competence ;
+  rdfs:label      "Deep Learning"@en , "Deep Learning"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_data_analysis
+  a               hrqde:Competence ;
+  rdfs:label      "Data Analysis"@en , "Datenanalyse"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_statistics
+  a               hrqde:Competence ;
+  rdfs:label      "Statistics"@en , "Statistik"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_containerisation
+  a               hrqde:Competence ;
+  rdfs:label      "Containerisation (Docker)"@en , "Containerisierung (Docker)"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_kubernetes
+  a               hrqde:Competence ;
+  rdfs:label      "Kubernetes orchestration"@en , "Kubernetes-Orchestrierung"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_cloud_aws
+  a               hrqde:Competence ;
+  rdfs:label      "Amazon Web Services (AWS)"@en , "Amazon Web Services"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_git
+  a               hrqde:Competence ;
+  rdfs:label      "Version control with Git"@en , "Versionskontrolle mit Git"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_rest_api
+  a               hrqde:Competence ;
+  rdfs:label      "REST API design and consumption"@en , "REST-API-Design und -Konsumption"@de ;
+  hrqde:placeholderUri true .
+
+hrqde:_skill_linux
+  a               hrqde:Competence ;
+  rdfs:label      "Linux system administration"@en , "Linux-Systemadministration"@de ;
+  hrqde:placeholderUri true .
+
+
+# =====================================================================
+# End of HR-QDE Skeleton Ontology v0.1
+#
+# Next steps:
+# 1. Validate this file in Protégé with HermiT reasoner.
+#    Expected outcome: no unsatisfiable classes, no cardinality
+#    conflicts, no cycles in subclass hierarchy.
+# 2. Persist the reasoner report to ontology/reasoner-report-v0.1.txt.
+# 3. Import this file into Neo4j+neosemantics via
+#       CALL n10s.rdf.import.fetch(
+#         "file:///import/hrqde-ontology-v0.1.ttl", "Turtle");
+# 4. SHACL shapes (hrqde-shapes-v0.1.ttl) will be added separately.
+# 5. ESCO bulk import (v1.2.1, EN+DE) is a separate build step.
+# =====================================================================

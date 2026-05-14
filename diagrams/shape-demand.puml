@@ -1,0 +1,74 @@
+@startuml shape-demand
+'==============================================================
+' HR-QDE Shape — Säule C (Sitzler) · Demand-Profile
+' Visualisierung der Klassen-Struktur und Cardinalities
+' Version 0.1 · 2026-05-11
+'==============================================================
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam classBackgroundColor #E8F4F8
+skinparam classBorderColor #2E6E8E
+skinparam noteBackgroundColor #FFF9E6
+skinparam noteBorderColor #B8860B
+skinparam arrowColor #444444
+skinparam linetype ortho
+
+title **Säule C — Demand-Profile**\n//Lieferung von Sitzler//
+
+class Employer {
+  + label : string
+}
+
+class JobPosting {
+  + postingDate : date
+  + sourceUrl   : URI {opt}
+}
+
+class QualificationRequirement {
+  + requirementKind      : "must" | "nice-to-have"
+  + provenanceConfidence : decimal [0.0–1.0]
+  + provenanceSource     : string {opt}
+}
+
+class "ESCO Skill" as ESCOSkill <<external>> #FFE4E1 {
+  + uri : http://data.europa.eu/esco/skill/...
+}
+
+class "ESCO Occupation" as ESCOOcc <<external>> #FFE4E1 {
+  + uri : http://data.europa.eu/esco/occupation/...
+}
+
+class "ProficiencyLevel" as DQR <<external>> #FFE4E1 {
+  + uri : http://hr-qde.org/ontology/DQR1..8
+}
+
+JobPosting "*" --> "1" Employer : issuedBy
+JobPosting "0..1" --> "1" ESCOOcc : refersToOccupation
+JobPosting "1" --> "1..*" QualificationRequirement : hasRequirement
+QualificationRequirement "1" --> "1" ESCOSkill : refersToCompetence
+QualificationRequirement "1" --> "1" DQR : requiredLevel
+
+note bottom of QualificationRequirement
+  **Option A:**
+  Genau **ein** ESCO-Skill und **ein**
+  ProficiencyLevel pro Anforderung.
+  Wenn die Stellenanzeige keinen Level
+  nennt, setzt die Pipeline einen Default
+  (dokumentiert im Pipeline-Protokoll).
+end note
+
+note top of Employer
+  Anonymisierung: offen,
+  mit Lehrstuhl zu klären.
+  In v0.1 schema-agnostisch.
+end note
+
+note bottom of JobPosting
+  **Posting-ID:** UUID, generiert
+  durch die Pipeline (Strategie D1).
+  Quell-URL als optionale Provenance.
+end note
+
+@enduml

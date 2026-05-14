@@ -1,0 +1,63 @@
+@startuml shape-asis
+'==============================================================
+' HR-QDE Shape — Säule A (Voeltz) · As-Is-Profile
+' Visualisierung der Klassen-Struktur und Cardinalities
+' Version 0.1 · 2026-05-11
+'==============================================================
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontStyle bold
+skinparam classBackgroundColor #E8F4F8
+skinparam classBorderColor #2E6E8E
+skinparam noteBackgroundColor #FFF9E6
+skinparam noteBorderColor #B8860B
+skinparam arrowColor #444444
+skinparam linetype ortho
+
+title **Säule A — As-Is-Profile**\n//Lieferung von Voeltz//
+
+class Learner {
+  + learnerId : string
+}
+
+class CompetencyProfile {
+  + (gehört zu genau einem Learner)
+}
+
+class AcquiredCompetence {
+  + provenanceConfidence : decimal [0.0–1.0]
+  + provenanceSource     : string {opt}
+  + acquiredOn           : date {opt}
+}
+
+class "ESCO Skill" as ESCOSkill <<external>> #FFE4E1 {
+  + uri : http://data.europa.eu/esco/skill/...
+}
+
+class "ProficiencyLevel" as DQR <<external>> #FFE4E1 {
+  + uri : http://hr-qde.org/ontology/DQR1..8
+}
+
+Learner "1" --> "1" CompetencyProfile : hasProfile
+CompetencyProfile "1" --> "1..*" AcquiredCompetence : containsCompetence
+AcquiredCompetence "1" --> "1" ESCOSkill : acquiredCompetenceOf
+AcquiredCompetence "1" --> "1" DQR : hasProficiencyLevel
+
+note bottom of AcquiredCompetence
+  **Option A:**
+  Eine AcquiredCompetence verweist auf
+  genau **einen** ESCO-Skill und **einen**
+  ProficiencyLevel.
+  Mehrdeutigkeit aus der Quelle löst die
+  NLP-Pipeline; verbleibende Unsicherheit
+  wird im Confidence-Wert konserviert.
+end note
+
+note top of Learner
+  Eine Lieferung enthält
+  **n** Learner-Instanzen
+  (typisch: 3 Pseudonyme).
+end note
+
+@enduml

@@ -1,0 +1,132 @@
+# =====================================================================
+# Example Delivery — Säule B (Köppe) · Supply-Profile
+# Version 0.1  ·  2026-05-13
+#
+# Three exemplary educational modules from two German higher-education
+# institutions, demonstrating a conformant delivery against
+# hrqde-shape-supply.ttl.
+#
+# Scope: grundständige Lehre (Bachelor and Master modules from
+# accredited German HEIs, in the HR-QDE sense).
+#
+# Domain: Informatik (matches Diss §3.1.2)
+# Validation: passes hrqde-shape-supply.ttl + hrqde-shapes-common.ttl
+# =====================================================================
+
+@prefix hrqde:       <http://hr-qde.org/ontology/> .
+@prefix koeppe:      <http://hr-qde.org/data/koeppe/> .
+@prefix hei:         <http://hr-qde.org/data/koeppe/hei/> .
+@prefix esco-skill:  <http://data.europa.eu/esco/skill/> .
+@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+
+# =====================================================================
+# Higher Education Institutions
+# =====================================================================
+
+hei:fuh
+  a                  hrqde:HigherEducationInstitution ;
+  rdfs:label         "FernUniversität in Hagen"@de ,
+                     "FernUniversität in Hagen"@en .
+
+hei:tum
+  a                  hrqde:HigherEducationInstitution ;
+  rdfs:label         "Technische Universität München"@de ,
+                     "Technical University of Munich"@en .
+
+
+# =====================================================================
+# Modul 1 — Einführung in die Informatik (FernUni Hagen)
+# =====================================================================
+
+koeppe:module_inf101
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "INF101" ;
+  rdfs:label                     "Einführung in die Informatik"@de ,
+                                 "Introduction to Computer Science"@en ;
+  hrqde:ects                     "10.0"^^xsd:decimal ;
+  hrqde:offeredBy                hei:fuh ;
+  hrqde:hasOutcome               koeppe:outcome_inf101_programming ,
+                                 koeppe:outcome_inf101_datastructures .
+
+koeppe:outcome_inf101_programming
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:targetLevel              hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.92"^^xsd:decimal ;
+  hrqde:provenanceSource         "module_handbook" ;
+  rdfs:comment                   "Programmiergrundlagen (Python), erste Algorithmen."@de .
+
+koeppe:outcome_inf101_datastructures
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:0a1cf67e-9e98-4b15-9c0e-572d6cd47b3e ;
+  hrqde:targetLevel              hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal ;
+  hrqde:provenanceSource         "module_handbook" .
+
+
+# =====================================================================
+# Modul 2 — Datenbanksysteme (FernUni Hagen) - mit Prerequisite
+# =====================================================================
+
+koeppe:module_inf301
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "INF301" ;
+  rdfs:label                     "Datenbanksysteme"@de ,
+                                 "Database Systems"@en ;
+  hrqde:ects                     "6.0"^^xsd:decimal ;
+  hrqde:offeredBy                hei:fuh ;
+  hrqde:hasOutcome               koeppe:outcome_inf301_dbuse ,
+                                 koeppe:outcome_inf301_sql ;
+  hrqde:requiresCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d .
+
+koeppe:outcome_inf301_dbuse
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:ab1e97ed-2319-4293-a8b7-072d2648822f ;
+  hrqde:targetLevel              hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.90"^^xsd:decimal ;
+  hrqde:provenanceSource         "module_handbook" .
+
+koeppe:outcome_inf301_sql
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:11430d93-c835-48ed-8e70-285fa69c9ae6 ;
+  hrqde:targetLevel              hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.95"^^xsd:decimal ;
+  hrqde:provenanceSource         "module_handbook" .
+
+
+# =====================================================================
+# Modul 3 — Machine Learning Foundations (TU München)
+# =====================================================================
+
+koeppe:module_mlf200
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "MLF200" ;
+  rdfs:label                     "Grundlagen des Maschinellen Lernens"@de ,
+                                 "Machine Learning Foundations"@en ;
+  hrqde:ects                     "8.0"^^xsd:decimal ;
+  hrqde:offeredBy                hei:tum ;
+  hrqde:hasOutcome               koeppe:outcome_mlf200_ml ,
+                                 koeppe:outcome_mlf200_stats ;
+  hrqde:requiresCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d .
+
+koeppe:outcome_mlf200_ml
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:19a8293b-8e95-4de3-983f-77484079c389 ;
+  hrqde:targetLevel              hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.93"^^xsd:decimal ;
+  hrqde:provenanceSource         "module_handbook" .
+
+koeppe:outcome_mlf200_stats
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:ce8ae6ca-61d8-4174-b457-641de96cbff4 ;
+  hrqde:targetLevel              hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.88"^^xsd:decimal ;
+  hrqde:provenanceSource         "module_handbook" .
+
+
+# =====================================================================
+# End of example delivery
+# =====================================================================

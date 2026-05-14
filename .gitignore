@@ -1,0 +1,27 @@
+# =====================================================================
+# HR-QDE Masterand Toolkit — .gitignore
+# =====================================================================
+
+# Docker / Neo4j runtime data
+neo4j-import/
+!neo4j-import/.gitkeep
+neo4j-plugins/
+!neo4j-plugins/.gitkeep
+
+# Local masterand work-in-progress
+*.draft.ttl
+*.local.ttl
+deliveries/
+
+# IDE and editor metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~

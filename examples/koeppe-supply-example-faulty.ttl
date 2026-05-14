@@ -1,0 +1,114 @@
+# =====================================================================
+# Example Delivery (FAULTY) — Säule B (Köppe) · Supply-Profile
+# Version 0.1  ·  2026-05-13
+#
+# Deliberately faulty delivery that contains four SHACL violations,
+# demonstrating how hrqde-shape-supply.ttl reports each kind of error.
+#
+# Expected violations on validation:
+#
+#   1. module_bad_001 → missing offeredBy (no HEI reference)
+#   2. module_bad_002 → ects = -3.0 (minExclusive 0.0)
+#   3. outcome_bad_003 → two ESCO skills (maxCount 1 / Option A)
+#   4. module_bad_004 → no hasOutcome (minCount 1)
+# =====================================================================
+
+@prefix hrqde:       <http://hr-qde.org/ontology/> .
+@prefix koeppe:      <http://hr-qde.org/data/koeppe/> .
+@prefix hei:         <http://hr-qde.org/data/koeppe/hei/> .
+@prefix esco-skill:  <http://data.europa.eu/esco/skill/> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+
+hei:fuh
+  a                  hrqde:HigherEducationInstitution ;
+  rdfs:label         "FernUniversität in Hagen"@de .
+
+
+# =====================================================================
+# VIOLATION 1: Module without offeredBy
+# =====================================================================
+
+koeppe:module_bad_001
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "BAD001" ;
+  rdfs:label                     "Schlechtes Modul ohne Hochschule"@de ;
+  hrqde:ects                     "5.0"^^xsd:decimal ;
+  hrqde:hasOutcome               koeppe:outcome_bad_001 .
+  # missing: hrqde:offeredBy
+
+koeppe:outcome_bad_001
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:targetLevel              hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: EducationalModuleShape violation
+#   "EducationalModule must reference exactly one HigherEducationInstitution."
+
+
+# =====================================================================
+# VIOLATION 2: Negative ECTS value
+# =====================================================================
+
+koeppe:module_bad_002
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "BAD002" ;
+  rdfs:label                     "Modul mit negativem ECTS"@de ;
+  hrqde:ects                     "-3.0"^^xsd:decimal ;
+  hrqde:offeredBy                hei:fuh ;
+  hrqde:hasOutcome               koeppe:outcome_bad_002 .
+
+koeppe:outcome_bad_002
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:targetLevel              hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: EducationalModuleShape violation
+#   "EducationalModule must carry a positive ECTS value."
+
+
+# =====================================================================
+# VIOLATION 3: LearningOutcome references two skills (Option A breach)
+# =====================================================================
+
+koeppe:module_bad_003
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "BAD003" ;
+  rdfs:label                     "Modul mit mehrdeutigem Outcome"@de ;
+  hrqde:ects                     "5.0"^^xsd:decimal ;
+  hrqde:offeredBy                hei:fuh ;
+  hrqde:hasOutcome               koeppe:outcome_bad_003 .
+
+koeppe:outcome_bad_003
+  a                              hrqde:LearningOutcome ;
+  hrqde:targetsCompetence        esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ,
+                                 esco-skill:11430d93-c835-48ed-8e70-285fa69c9ae6 ;
+  hrqde:targetLevel              hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: LearningOutcomeShape violation
+#   "LearningOutcome must reference exactly one ESCO skill URI."
+
+
+# =====================================================================
+# VIOLATION 4: Module without any LearningOutcome
+# =====================================================================
+
+koeppe:module_bad_004
+  a                              hrqde:EducationalModule ;
+  hrqde:moduleCode               "BAD004" ;
+  rdfs:label                     "Modul ohne Lernergebnisse"@de ;
+  hrqde:ects                     "3.0"^^xsd:decimal ;
+  hrqde:offeredBy                hei:fuh .
+  # missing: hrqde:hasOutcome
+
+# Expected: EducationalModuleShape violation
+#   "EducationalModule must have at least one LearningOutcome."
+
+
+# =====================================================================
+# End of faulty example delivery
+# =====================================================================

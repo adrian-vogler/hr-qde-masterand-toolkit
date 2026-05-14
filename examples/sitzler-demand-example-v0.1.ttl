@@ -1,0 +1,143 @@
+# =====================================================================
+# Example Delivery — Säule C (Sitzler) · Demand-Profile
+# Version 0.1.1  ·  2026-05-13
+#
+# Three exemplary job postings demonstrating a conformant delivery
+# against hrqde-shape-demand.ttl.
+#
+# v0.1.1: requirementKind values changed from "nice-to-have" to
+# "nice_to_have" to match the shape's controlled vocabulary (which
+# in turn avoids a neosemantics Cypher-generator collision with the
+# hyphen as subtraction operator).
+# =====================================================================
+
+@prefix hrqde:           <http://hr-qde.org/ontology/> .
+@prefix sitzler:         <http://hr-qde.org/data/sitzler/> .
+@prefix employer:        <http://hr-qde.org/data/sitzler/employer/> .
+@prefix esco-skill:      <http://data.europa.eu/esco/skill/> .
+@prefix esco-occupation: <http://data.europa.eu/esco/occupation/> .
+@prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+
+
+employer:techcorp
+  a                  hrqde:Employer ;
+  rdfs:label         "TechCorp GmbH"@de .
+
+employer:datalabs
+  a                  hrqde:Employer ;
+  rdfs:label         "DataLabs AG"@de .
+
+employer:startupxy
+  a                  hrqde:Employer ;
+  rdfs:label         "StartUpXY UG"@de .
+
+
+# JobPosting 1 — Senior Python Developer (TechCorp) ===================
+
+sitzler:posting_a8f3c2e1
+  a                              hrqde:JobPosting ;
+  hrqde:postingDate              "2026-04-22"^^xsd:date ;
+  hrqde:issuedBy                 employer:techcorp ;
+  hrqde:sourceUrl                "https://example.com/jobs/techcorp/senior-python-dev"^^xsd:anyURI ;
+  hrqde:hasRequirement           sitzler:req_a8f3c2e1_python ,
+                                 sitzler:req_a8f3c2e1_databases ,
+                                 sitzler:req_a8f3c2e1_ml .
+
+sitzler:req_a8f3c2e1_python
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            hrqde:DQR6 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.95"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+sitzler:req_a8f3c2e1_databases
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ab1e97ed-2319-4293-a8b7-072d2648822f ;
+  hrqde:requiredLevel            hrqde:DQR5 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.88"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+sitzler:req_a8f3c2e1_ml
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:19a8293b-8e95-4de3-983f-77484079c389 ;
+  hrqde:requiredLevel            hrqde:DQR5 ;
+  hrqde:requirementKind          "nice_to_have" ;
+  hrqde:provenanceConfidence     "0.75"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+
+# JobPosting 2 — Datenwissenschaftler (DataLabs, with ESCO occupation)
+
+sitzler:posting_b7d2e4f5
+  a                              hrqde:JobPosting ;
+  hrqde:postingDate              "2026-04-28"^^xsd:date ;
+  hrqde:issuedBy                 employer:datalabs ;
+  hrqde:refersToOccupation       esco-occupation:258e46f9-0075-4a2e-adae-1ff0477e0f30 ;
+  hrqde:sourceUrl                "https://example.com/jobs/datalabs/data-scientist"^^xsd:anyURI ;
+  hrqde:hasRequirement           sitzler:req_b7d2e4f5_python ,
+                                 sitzler:req_b7d2e4f5_ml ,
+                                 sitzler:req_b7d2e4f5_stats ,
+                                 sitzler:req_b7d2e4f5_sql .
+
+sitzler:req_b7d2e4f5_python
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            hrqde:DQR6 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.92"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+sitzler:req_b7d2e4f5_ml
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:19a8293b-8e95-4de3-983f-77484079c389 ;
+  hrqde:requiredLevel            hrqde:DQR7 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.95"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+sitzler:req_b7d2e4f5_stats
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ce8ae6ca-61d8-4174-b457-641de96cbff4 ;
+  hrqde:requiredLevel            hrqde:DQR6 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+sitzler:req_b7d2e4f5_sql
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:11430d93-c835-48ed-8e70-285fa69c9ae6 ;
+  hrqde:requiredLevel            hrqde:DQR5 ;
+  hrqde:requirementKind          "nice_to_have" ;
+  hrqde:provenanceConfidence     "0.78"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+
+# JobPosting 3 — Junior Backend Developer (StartUpXY) =================
+
+sitzler:posting_c5e1a8b3
+  a                              hrqde:JobPosting ;
+  hrqde:postingDate              "2026-05-02"^^xsd:date ;
+  hrqde:issuedBy                 employer:startupxy ;
+  hrqde:sourceUrl                "https://example.com/jobs/startupxy/junior-backend"^^xsd:anyURI ;
+  hrqde:hasRequirement           sitzler:req_c5e1a8b3_python ,
+                                 sitzler:req_c5e1a8b3_sql .
+
+sitzler:req_c5e1a8b3_python
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            hrqde:DQR4 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.80"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .
+
+sitzler:req_c5e1a8b3_sql
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:11430d93-c835-48ed-8e70-285fa69c9ae6 ;
+  hrqde:requiredLevel            hrqde:DQR4 ;
+  hrqde:requirementKind          "nice_to_have" ;
+  hrqde:provenanceConfidence     "0.70"^^xsd:decimal ;
+  hrqde:provenanceSource         "job_posting" .

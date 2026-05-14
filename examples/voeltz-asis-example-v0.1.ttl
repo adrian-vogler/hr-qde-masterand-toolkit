@@ -1,0 +1,147 @@
+# =====================================================================
+# Example Delivery — Säule A (Voeltz) · As-Is-Profile
+# Version 0.1  ·  2026-05-13
+#
+# Three exemplary learner profiles demonstrating a conformant
+# delivery against hrqde-shape-asis.ttl.
+#
+# Domain: Informatik (matches Diss §3.1.2)
+# Validation: passes hrqde-shape-asis.ttl + hrqde-shapes-common.ttl
+# =====================================================================
+
+@prefix hrqde:       <http://hr-qde.org/ontology/> .
+@prefix voeltz:      <http://hr-qde.org/data/voeltz/> .
+@prefix esco-skill:  <http://data.europa.eu/esco/skill/> .
+@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+
+# =====================================================================
+# Lerner_001 — Junior, Bachelor-frisch
+# =====================================================================
+
+voeltz:learner_001
+  a                  hrqde:Learner ;
+  hrqde:hasProfile   voeltz:profile_001 .
+
+voeltz:profile_001
+  a                            hrqde:CompetencyProfile ;
+  hrqde:containsCompetence     voeltz:competence_001_python ,
+                               voeltz:competence_001_sql ,
+                               voeltz:competence_001_databases .
+
+voeltz:competence_001_python
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:hasProficiencyLevel      hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.95"^^xsd:decimal ;
+  hrqde:provenanceSource         "transcript" .
+
+voeltz:competence_001_sql
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:11430d93-c835-48ed-8e70-285fa69c9ae6 ;
+  hrqde:hasProficiencyLevel      hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.88"^^xsd:decimal ;
+  hrqde:provenanceSource         "transcript" .
+
+voeltz:competence_001_databases
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ab1e97ed-2319-4293-a8b7-072d2648822f ;
+  hrqde:hasProficiencyLevel      hrqde:DQR4 ;
+  hrqde:provenanceConfidence     "0.75"^^xsd:decimal ;
+  hrqde:provenanceSource         "cv" .
+
+
+# =====================================================================
+# Lerner_002 — Mid-Level, 5 Jahre Berufserfahrung
+# =====================================================================
+
+voeltz:learner_002
+  a                  hrqde:Learner ;
+  hrqde:hasProfile   voeltz:profile_002 .
+
+voeltz:profile_002
+  a                            hrqde:CompetencyProfile ;
+  hrqde:containsCompetence     voeltz:competence_002_python ,
+                               voeltz:competence_002_ml ,
+                               voeltz:competence_002_analysis ,
+                               voeltz:competence_002_databases ,
+                               voeltz:competence_002_stats .
+
+voeltz:competence_002_python
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:hasProficiencyLevel      hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.95"^^xsd:decimal ;
+  hrqde:provenanceSource         "cv" .
+
+voeltz:competence_002_ml
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:19a8293b-8e95-4de3-983f-77484079c389 ;
+  hrqde:hasProficiencyLevel      hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.82"^^xsd:decimal ;
+  hrqde:provenanceSource         "cv" .
+
+voeltz:competence_002_analysis
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ae4f0cc6-e0b9-47f5-bdca-2fc2e6316dce ;
+  hrqde:hasProficiencyLevel      hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.90"^^xsd:decimal ;
+  hrqde:provenanceSource         "certificate" .
+
+voeltz:competence_002_databases
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ab1e97ed-2319-4293-a8b7-072d2648822f ;
+  hrqde:hasProficiencyLevel      hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal ;
+  hrqde:provenanceSource         "cv" .
+
+voeltz:competence_002_stats
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ce8ae6ca-61d8-4174-b457-641de96cbff4 ;
+  hrqde:hasProficiencyLevel      hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.65"^^xsd:decimal ;
+  hrqde:provenanceSource         "self_declaration" .
+
+
+# =====================================================================
+# Lerner_003 — Senior, Quereinsteiger mit Maschinenbau-Background
+# =====================================================================
+
+voeltz:learner_003
+  a                  hrqde:Learner ;
+  hrqde:hasProfile   voeltz:profile_003 .
+
+voeltz:profile_003
+  a                            hrqde:CompetencyProfile ;
+  hrqde:containsCompetence     voeltz:competence_003_python ,
+                               voeltz:competence_003_engineering ,
+                               voeltz:competence_003_pm .
+
+voeltz:competence_003_python
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:hasProficiencyLevel      hrqde:DQR4 ;
+  hrqde:provenanceConfidence     "0.55"^^xsd:decimal ;
+  hrqde:provenanceSource         "cv" ;
+  rdfs:comment                   "Low confidence: ambiguous CV phrasing ('Python-Kenntnisse vorhanden') without further evidence."@de .
+
+voeltz:competence_003_engineering
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:f0de4973-0a70-4644-8fd4-3a97080476f4 ;
+  hrqde:hasProficiencyLevel      hrqde:DQR7 ;
+  hrqde:provenanceConfidence     "0.95"^^xsd:decimal ;
+  hrqde:provenanceSource         "transcript" .
+
+voeltz:competence_003_pm
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:21d2f96d-35f7-4e3f-9745-c533d2dd6e97 ;
+  hrqde:hasProficiencyLevel      hrqde:DQR6 ;
+  hrqde:provenanceConfidence     "0.90"^^xsd:decimal ;
+  hrqde:provenanceSource         "reference" .
+
+
+# =====================================================================
+# End of example delivery
+# =====================================================================

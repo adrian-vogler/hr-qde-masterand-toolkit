@@ -1,0 +1,120 @@
+# =====================================================================
+# Example Delivery (FAULTY) — Säule C (Sitzler) · Demand-Profile
+# Version 0.1  ·  2026-05-13
+#
+# Deliberately faulty delivery that contains four SHACL violations,
+# demonstrating how hrqde-shape-demand.ttl reports each kind of error.
+#
+# Expected violations on validation:
+#
+#   1. posting_bad_001 → missing postingDate (Cardinality minCount 1)
+#   2. req_bad_002 → requirementKind = "preferred" (sh:in vocabulary)
+#   3. posting_bad_003 → two Employer references (maxCount 1)
+#   4. req_bad_004 → requiredLevel = DQR9 (pattern violation)
+# =====================================================================
+
+@prefix hrqde:           <http://hr-qde.org/ontology/> .
+@prefix sitzler:         <http://hr-qde.org/data/sitzler/> .
+@prefix employer:        <http://hr-qde.org/data/sitzler/employer/> .
+@prefix esco-skill:      <http://data.europa.eu/esco/skill/> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+
+
+employer:techcorp
+  a                  hrqde:Employer ;
+  rdfs:label         "TechCorp GmbH"@de .
+
+employer:dataworks
+  a                  hrqde:Employer ;
+  rdfs:label         "DataWorks GmbH"@de .
+
+
+# =====================================================================
+# VIOLATION 1: JobPosting without postingDate
+# =====================================================================
+
+sitzler:posting_bad_001
+  a                              hrqde:JobPosting ;
+  hrqde:issuedBy                 employer:techcorp ;
+  hrqde:hasRequirement           sitzler:req_bad_001 .
+  # missing: hrqde:postingDate
+
+sitzler:req_bad_001
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            hrqde:DQR5 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: JobPostingShape violation
+#   "JobPosting must carry a postingDate (xsd:date)."
+
+
+# =====================================================================
+# VIOLATION 2: requirementKind from a wider vocabulary
+# =====================================================================
+
+sitzler:posting_bad_002
+  a                              hrqde:JobPosting ;
+  hrqde:postingDate              "2026-04-15"^^xsd:date ;
+  hrqde:issuedBy                 employer:techcorp ;
+  hrqde:hasRequirement           sitzler:req_bad_002 .
+
+sitzler:req_bad_002
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            hrqde:DQR5 ;
+  hrqde:requirementKind          "preferred" ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: QualificationRequirementShape violation
+#   "requirementKind must be 'must' or 'nice-to-have'."
+
+
+# =====================================================================
+# VIOLATION 3: JobPosting with two Employers
+# =====================================================================
+
+sitzler:posting_bad_003
+  a                              hrqde:JobPosting ;
+  hrqde:postingDate              "2026-04-18"^^xsd:date ;
+  hrqde:issuedBy                 employer:techcorp ,
+                                 employer:dataworks ;
+  hrqde:hasRequirement           sitzler:req_bad_003 .
+
+sitzler:req_bad_003
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            hrqde:DQR5 ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: JobPostingShape violation
+#   "JobPosting must reference exactly one Employer."
+
+
+# =====================================================================
+# VIOLATION 4: requiredLevel outside DQR1-DQR8 range
+# =====================================================================
+
+sitzler:posting_bad_004
+  a                              hrqde:JobPosting ;
+  hrqde:postingDate              "2026-04-20"^^xsd:date ;
+  hrqde:issuedBy                 employer:techcorp ;
+  hrqde:hasRequirement           sitzler:req_bad_004 .
+
+sitzler:req_bad_004
+  a                              hrqde:QualificationRequirement ;
+  hrqde:refersToCompetence       esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:requiredLevel            <http://hr-qde.org/ontology/DQR9> ;
+  hrqde:requirementKind          "must" ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: QualificationRequirementShape violation
+#   "QualificationRequirement must reference exactly one ProficiencyLevel (DQR1-DQR8)."
+
+
+# =====================================================================
+# End of faulty example delivery
+# =====================================================================

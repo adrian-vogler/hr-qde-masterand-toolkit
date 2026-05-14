@@ -1,0 +1,104 @@
+# =====================================================================
+# Example Delivery (FAULTY) — Säule A (Voeltz) · As-Is-Profile
+# Version 0.1  ·  2026-05-13
+#
+# Deliberately faulty delivery that contains four SHACL violations,
+# demonstrating how hrqde-shape-asis.ttl reports each kind of error.
+#
+# Expected violations on validation:
+#
+#   1. learner_bad_001 → missing hasProfile (Cardinality minCount 1)
+#   2. competence_bad_002 → provenanceConfidence "1.5" (maxInclusive 1.0)
+#   3. competence_bad_003 → skill reference is a string, not an IRI
+#   4. competence_bad_004 → missing hasProficiencyLevel (minCount 1)
+# =====================================================================
+
+@prefix hrqde:       <http://hr-qde.org/ontology/> .
+@prefix voeltz:      <http://hr-qde.org/data/voeltz/> .
+@prefix esco-skill:  <http://data.europa.eu/esco/skill/> .
+@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+
+# =====================================================================
+# VIOLATION 1: Learner without hasProfile
+# =====================================================================
+
+voeltz:learner_bad_001
+  a   hrqde:Learner .
+  # missing: hrqde:hasProfile
+
+# Expected: LearnerShape violation
+#   "Learner must have exactly one CompetencyProfile."
+
+
+# =====================================================================
+# VIOLATION 2: Confidence value out of range
+# =====================================================================
+
+voeltz:learner_bad_002
+  a                  hrqde:Learner ;
+  hrqde:hasProfile   voeltz:profile_bad_002 .
+
+voeltz:profile_bad_002
+  a                            hrqde:CompetencyProfile ;
+  hrqde:containsCompetence     voeltz:competence_bad_002 .
+
+voeltz:competence_bad_002
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:hasProficiencyLevel      hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "1.5"^^xsd:decimal ;
+  hrqde:provenanceSource         "cv" .
+
+# Expected: AcquiredCompetenceShape violation
+#   "provenanceConfidence must be a decimal in [0.0, 1.0]."
+
+
+# =====================================================================
+# VIOLATION 3: Skill reference is a string literal, not an IRI
+# =====================================================================
+
+voeltz:learner_bad_003
+  a                  hrqde:Learner ;
+  hrqde:hasProfile   voeltz:profile_bad_003 .
+
+voeltz:profile_bad_003
+  a                            hrqde:CompetencyProfile ;
+  hrqde:containsCompetence     voeltz:competence_bad_003 .
+
+voeltz:competence_bad_003
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     "Python" ;
+  hrqde:hasProficiencyLevel      hrqde:DQR5 ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+
+# Expected: AcquiredCompetenceShape violation
+#   "AcquiredCompetence must reference exactly one ESCO skill URI."
+
+
+# =====================================================================
+# VIOLATION 4: Missing hasProficiencyLevel
+# =====================================================================
+
+voeltz:learner_bad_004
+  a                  hrqde:Learner ;
+  hrqde:hasProfile   voeltz:profile_bad_004 .
+
+voeltz:profile_bad_004
+  a                            hrqde:CompetencyProfile ;
+  hrqde:containsCompetence     voeltz:competence_bad_004 .
+
+voeltz:competence_bad_004
+  a                              hrqde:AcquiredCompetence ;
+  hrqde:acquiredCompetenceOf     esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  hrqde:provenanceConfidence     "0.85"^^xsd:decimal .
+  # missing: hrqde:hasProficiencyLevel
+
+# Expected: AcquiredCompetenceShape violation
+#   "AcquiredCompetence must reference exactly one ProficiencyLevel."
+
+
+# =====================================================================
+# End of faulty example delivery
+# =====================================================================
