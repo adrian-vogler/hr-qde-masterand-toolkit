@@ -1,6 +1,6 @@
 # =====================================================================
 # HR-QDE SHACL Shapes — Combined File
-# Version 0.1.2  ·  2026-05-13
+# Version 0.1.3  ·  2026-05-17
 #
 # Single-file aggregate of all shape modules. Used because neosemantics
 # n10s.validation.shacl.import.fetch overwrites previous shape sets.
@@ -10,6 +10,14 @@
 # v0.1.2: single quotes removed from all sh:message texts (neosemantics
 #         does not escape single quotes when generating the Cypher
 #         validation query, causing string termination crashes).
+# v0.1.3: aligned with hrqde-ontology v0.1.1.
+#         - EducationalModuleShape: added moduleType property constraint
+#           with sh:in controlled vocabulary, plus optional
+#           hasUnmappedOutcome.
+#         - LearningOutcomeShape: provenanceSource value list documented.
+#         - UnmappedLearningOutcomeShape: new shape for the Säule-B
+#           unmapped-outcome class (reviewReason + evidenceExcerpt
+#           required, no targetsCompetence required).
 # =====================================================================
 
 @prefix hrqde:       <http://hr-qde.org/ontology/> .
@@ -129,9 +137,27 @@ hrqde-shape:EducationalModuleShape
                     "Lehrmodul muss mindestens ein Lernergebnis haben."@de ;
   ] ;
   sh:property [
+    sh:path         hrqde:hasUnmappedOutcome ;
+    sh:nodeKind     sh:IRI ;
+    sh:message      "If present, hasUnmappedOutcome must reference an UnmappedLearningOutcome IRI."@en ;
+  ] ;
+  sh:property [
     sh:path         hrqde:requiresCompetence ;
     sh:nodeKind     sh:IRI ;
     sh:pattern      "^http://data\\.europa\\.eu/esco/skill/" ;
+  ] ;
+  sh:property [
+    sh:path         hrqde:moduleType ;
+    sh:datatype     xsd:string ;
+    sh:maxCount     1 ;
+    sh:in           ("Pflichtmodul"
+                     "Bachelorseminar"
+                     "Masterseminar"
+                     "Fachpraktikum"
+                     "Projektpraktikum"
+                     "Abschlussmodul") ;
+    sh:message      "moduleType must be one of: Pflichtmodul, Bachelorseminar, Masterseminar, Fachpraktikum, Projektpraktikum, Abschlussmodul."@en ,
+                    "moduleType muss einer der Werte sein: Pflichtmodul, Bachelorseminar, Masterseminar, Fachpraktikum, Projektpraktikum, Abschlussmodul."@de ;
   ] .
 
 hrqde-shape:LearningOutcomeShape
@@ -166,6 +192,48 @@ hrqde-shape:LearningOutcomeShape
     sh:datatype     xsd:string ;
     sh:in           ("module_handbook" "course_catalog") ;
     sh:maxCount     1 ;
+  ] .
+
+# v0.1.3 ADDITION: UnmappedLearningOutcomeShape
+hrqde-shape:UnmappedLearningOutcomeShape
+  a                 sh:NodeShape ;
+  sh:targetClass    hrqde:UnmappedLearningOutcome ;
+  sh:property [
+    sh:path         rdfs:label ;
+    sh:minCount     1 ;
+    sh:message      "UnmappedLearningOutcome must carry at least one rdfs:label for human review."@en ,
+                    "UnmappedLearningOutcome muss mindestens ein rdfs:label tragen, damit es manuell reviewt werden kann."@de ;
+  ] ;
+  sh:property [
+    sh:path         hrqde:reviewReason ;
+    sh:datatype     xsd:string ;
+    sh:minCount     1 ;
+    sh:maxCount     1 ;
+    sh:minLength    1 ;
+    sh:message      "UnmappedLearningOutcome must carry exactly one reviewReason describing why no ESCO link was established."@en ,
+                    "UnmappedLearningOutcome muss genau einen reviewReason tragen, der erklärt, warum keine ESCO-Verknüpfung möglich war."@de ;
+  ] ;
+  sh:property [
+    sh:path         hrqde:evidenceExcerpt ;
+    sh:datatype     xsd:string ;
+    sh:minCount     1 ;
+    sh:maxCount     1 ;
+    sh:minLength    1 ;
+    sh:message      "UnmappedLearningOutcome must carry exactly one evidenceExcerpt from the source document for manual review."@en ,
+                    "UnmappedLearningOutcome muss genau einen evidenceExcerpt aus dem Quelldokument tragen, um manuelle Überprüfung zu ermöglichen."@de ;
+  ] ;
+  sh:property [
+    sh:path         hrqde:provenanceSource ;
+    sh:datatype     xsd:string ;
+    sh:in           ("module_handbook" "course_catalog") ;
+    sh:maxCount     1 ;
+  ] ;
+  sh:property [
+    sh:path         hrqde:provenanceConfidence ;
+    sh:datatype     xsd:decimal ;
+    sh:maxCount     1 ;
+    sh:minInclusive "0.0"^^xsd:decimal ;
+    sh:maxInclusive "1.0"^^xsd:decimal ;
   ] .
 
 hrqde-shape:HigherEducationInstitutionShape
