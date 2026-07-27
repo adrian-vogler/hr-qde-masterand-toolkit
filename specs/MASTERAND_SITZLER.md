@@ -37,6 +37,12 @@ Pro QualificationRequirement **genau ein** ESCO-Skill. Bei mehrdeutigen
 Formulierungen entscheidet die Pipeline; die Restunsicherheit wird im
 `provenanceConfidence`-Feld konserviert.
 
+Die URI muss aus dem **offiziellen ESCO-Datensatz v1.2.1** stammen und
+die kanonische UUID-Form haben
+(`http://data.europa.eu/esco/skill/<uuid>`). Bezugsquelle und Details
+stehen im README, Abschnitt "ESCO vocabulary". Eigene Platzhalter- oder
+Bootstrap-URIs bestehen die Validierung ab Shapes v0.2.0 nicht mehr.
+
 ## 4. requirementKind — nur zwei Werte
 
 Stellenanzeigen verwenden vielfältige Formulierungen für die Härte

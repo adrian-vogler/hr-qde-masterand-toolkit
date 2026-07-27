@@ -1,6 +1,6 @@
 # =====================================================================
 # HR-QDE SHACL Shapes — Combined File
-# Version 0.1.3  ·  2026-05-17
+# Version 0.2.0  ·  2026-07-27
 #
 # Single-file aggregate of all shape modules. Used because neosemantics
 # n10s.validation.shacl.import.fetch overwrites previous shape sets.
@@ -10,6 +10,14 @@
 # v0.1.2: single quotes removed from all sh:message texts (neosemantics
 #         does not escape single quotes when generating the Cypher
 #         validation query, causing string termination crashes).
+# v0.2.0: ESCO vocabulary binding enforced. All four skill-URI
+#         patterns (acquiredCompetenceOf, requiresCompetence,
+#         targetsCompetence, refersToCompetence) now require the
+#         canonical UUID form of ESCO skill URIs. Deliveries built
+#         against placeholder indexes (e.g. esco/skill/mini/...)
+#         fail validation instead of passing silently. Rationale:
+#         only shared canonical URIs make demand and supply joinable
+#         in the HR-QDE graph (coverage and gap analysis).
 # v0.1.3: aligned with hrqde-ontology v0.1.1.
 #         - EducationalModuleShape: added moduleType property constraint
 #           with sh:in controlled vocabulary, plus optional
@@ -60,7 +68,7 @@ hrqde-shape:AcquiredCompetenceShape
     sh:minCount     1 ;
     sh:maxCount     1 ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/" ;
+    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" ;
     sh:message      "AcquiredCompetence must reference exactly one ESCO skill URI."@en ,
                     "AcquiredCompetence muss genau eine ESCO-Skill-URI referenzieren."@de ;
   ] ;
@@ -144,7 +152,7 @@ hrqde-shape:EducationalModuleShape
   sh:property [
     sh:path         hrqde:requiresCompetence ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/" ;
+    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" ;
   ] ;
   sh:property [
     sh:path         hrqde:moduleType ;
@@ -168,7 +176,7 @@ hrqde-shape:LearningOutcomeShape
     sh:minCount     1 ;
     sh:maxCount     1 ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/" ;
+    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" ;
     sh:message      "LearningOutcome must reference exactly one ESCO skill URI."@en ,
                     "Lernergebnis muss genau eine ESCO-Skill-URI referenzieren."@de ;
   ] ;
@@ -296,7 +304,9 @@ hrqde-shape:QualificationRequirementShape
     sh:minCount     1 ;
     sh:maxCount     1 ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/" ;
+    sh:pattern      "^http://data\\.europa\\.eu/esco/skill/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" ;
+    sh:message      "refersToCompetence must be a canonical ESCO skill URI (UUID form). Placeholder or bootstrap URIs such as esco/skill/mini/... are rejected."@en ,
+                    "refersToCompetence muss eine kanonische ESCO-Skill-URI (UUID-Form) sein. Platzhalter- oder Bootstrap-URIs wie esco/skill/mini/... werden abgewiesen."@de ;
   ] ;
   sh:property [
     sh:path         hrqde:requiredLevel ;

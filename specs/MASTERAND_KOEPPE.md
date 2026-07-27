@@ -42,6 +42,12 @@ Strukturelle Form siehe `shape-supply.png`.
 
 ## 3. Option A — eine ESCO-URI pro LearningOutcome
 
+Die URI muss aus dem **offiziellen ESCO-Datensatz v1.2.1** stammen und
+die kanonische UUID-Form haben
+(`http://data.europa.eu/esco/skill/<uuid>`). Bezugsquelle und Details
+stehen im README, Abschnitt "ESCO vocabulary". Eigene Platzhalter- oder
+Bootstrap-URIs bestehen die Validierung ab Shapes v0.2.0 nicht mehr.
+
 Analog zu Säule A: pro LearningOutcome **genau ein** ESCO-Skill. Bei
 mehrdeutigen Lernzielen (z.B. "Programmierung allgemein") wird der
 **abstraktere** ESCO-Skill gewählt (höher in der broaderTransitive-

@@ -37,6 +37,12 @@ visualisiert.
 
 ## 3. Option A — eine ESCO-URI pro Kompetenz
 
+Die URI muss aus dem **offiziellen ESCO-Datensatz v1.2.1** stammen und
+die kanonische UUID-Form haben
+(`http://data.europa.eu/esco/skill/<uuid>`). Bezugsquelle und Details
+stehen im README, Abschnitt "ESCO vocabulary". Eigene Platzhalter- oder
+Bootstrap-URIs bestehen die Validierung ab Shapes v0.2.0 nicht mehr.
+
 Pro AcquiredCompetence wird auf **genau einen** ESCO-Skill verwiesen.
 Bei mehrdeutiger Quellinformation (z.B. "Datenbanken" — könnte SQL
 Server oder use databases sein) entscheidet die Pipeline. Die
