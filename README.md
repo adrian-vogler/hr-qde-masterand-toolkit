@@ -1,4 +1,4 @@
-# HR-QDE Toolkit
+# HR-QDE Masterand Toolkit
 
 Toolkit for contributing structured deliveries to the HR-QDE research
 project at FernUniversität in Hagen. Provides the validation
@@ -35,7 +35,6 @@ masterand — is covered by a separate contract, not by this toolkit.)
 | `neo4j-import/` | Files staged here are visible inside the Neo4j container as `/var/lib/neo4j/import/` |
 | `compose.yaml` | Docker compose file with a stripped-down Neo4j+neosemantics setup |
 | `init.cypher` | One-time bootstrap script that initialises the graph |
-| `validate.py` | Authoritative pyshacl validation of a delivery against the combined shapes (see Validation workflow) |
 
 ## Prerequisites
 
@@ -53,8 +52,8 @@ framework.
 ### 1. Clone the toolkit
 
 ```
-git clone https://github.com/adrian-vogler/hr-qde-masterand-toolkit.git
-cd hr-qde-masterand-toolkit
+git clone https://github.com/adrian-vogler/hr-qde-toolkit.git
+cd hr-qde-toolkit
 ```
 
 ### 2. Start the Neo4j container
@@ -138,25 +137,6 @@ A conformant delivery returns no rows. A faulty delivery returns one
 row per violation, with a focus node, the violated constraint, and a
 human-readable message.
 
-### Authoritative check: validate.py (pyshacl)
-
-The neosemantics validator does not evaluate `sh:pattern` constraints
-on IRI values. Among other things it therefore does not catch
-non-canonical ESCO skill URIs (see the ESCO vocabulary section). The
-authoritative validation therefore runs outside the container, with
-pyshacl:
-
-```
-pip install pyshacl
-python validate.py my-delivery.ttl
-```
-
-Exit code 0 means the delivery conforms; violations are printed with
-focus node, constraint, and message. Run `validate.py` on every
-delivery before sending it, in addition to (or instead of) the
-in-container workflow above. The in-container workflow remains useful
-for exploring your delivery as a graph.
-
 To clean the delivery from the graph and validate a new one:
 
 ```cypher
@@ -198,45 +178,6 @@ use it as the structural template for your own pipeline output.
 4. **Inspect the faulty example** to see what the validator catches.
 5. **Reference the SHACL shape** in `ontology/hrqde-shapes-all.ttl`
    for the formal contract.
-
-## ESCO vocabulary (mandatory for all pillars)
-
-All skill references in deliveries (`acquiredCompetenceOf`,
-`requiresCompetence`, `targetsCompetence`, `refersToCompetence`) must
-use **canonical URIs from the official ESCO dataset, version
-v1.2.1** — the same version loaded in the HR-QDE platform graph.
-Canonical skill URIs have the UUID form:
-
-```
-http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d
-```
-
-Self-invented or bootstrap URIs (for example
-`http://data.europa.eu/esco/skill/mini/...`) do not exist in ESCO.
-They import without error, but they never join with the other pillars
-in the HR-QDE graph, so coverage and gap analysis stay empty. **Since
-shapes v0.2.0 such URIs fail validation** instead of passing
-silently.
-
-### Where to get ESCO v1.2.1
-
-Open <https://esco.ec.europa.eu/en/use-esco/download> in a browser.
-In the **"Your ESCO dataset"** section, set:
-
-- **Version:** `ESCO dataset - v1.2.1`
-- **Content:** `Classification`
-- **File type:** `ttl` (or `csv`, if your pipeline builds its concept
-  index from tabular data; both carry the same canonical URIs)
-
-Click **"Add to your package"**, then **"Export your dataset"**. The
-download is a ZIP of about 173 MB; the TTL extracts to roughly
-795 MB. Note: the default Windows extractor reports an "invalid ZIP"
-error on this file, which is a known ESCO issue. Use 7-Zip
-(<https://www.7-zip.org/>) or another modern extractor.
-
-Use the extracted dataset as the source of your pipeline's concept
-index, so that every mapped skill resolves to a canonical URI. As a
-sanity check: ESCO v1.2.1 contains 15163 skills and 3047 occupations.
 
 ## Naming conventions for deliveries
 
@@ -284,12 +225,10 @@ so reimport is required.
 
 - Säule D (integrated domain ontology) is not yet covered; that
   contract follows in a later version.
-- The in-container validator (neosemantics) catches `sh:pattern`
-  violations only on string literals, not on IRI values. This affects
-  out-of-range DQR levels expressed as URIs and the canonical-UUID
-  rule for ESCO skill URIs (shapes v0.2.0). Mitigation: run
-  `validate.py` (pyshacl), which evaluates all constraints; it is the
-  authoritative check.
+- The validator catches `sh:pattern` violations only on string
+  literals, not on IRI values (a neosemantics limitation). This
+  affects detection of out-of-range DQR levels when expressed as
+  URIs. The fix will appear in a later shapes version.
 - Shape files are intentionally provided only in their combined form
   (`hrqde-shapes-all.ttl`). Loading individual shape files
   sequentially does not work in neosemantics; the combined file is
