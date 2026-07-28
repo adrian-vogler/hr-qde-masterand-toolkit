@@ -1,4 +1,4 @@
-# HR-QDE Masterand Toolkit
+# HR-QDE Toolkit
 
 Toolkit for contributing structured deliveries to the HR-QDE research
 project at FernUniversität in Hagen. Provides the validation
