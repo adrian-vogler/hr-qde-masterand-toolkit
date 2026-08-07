@@ -1,0 +1,81 @@
+# =====================================================================
+# Example Delivery (FAULTY) — Säule D (Oberhuber)
+# Version 0.2  ·  2026-08-06
+#
+# Deliberately faulty delivery containing six SHACL violations, one per
+# error class that mini-artefakt v0.1 exhibited. Demonstrates how
+# hrqde-shape-harmonisation.ttl reports each of them.
+#
+# Expected violations on validation:
+#
+#   1. concept_bad_001 → typed on an ESCO node (URI pattern on the
+#      focus node: harmonisation annotations on reference vocabulary)
+#   2. concept_bad_002 → derivedFrom as string instead of framework IRI
+#   3. mapping_bad_003 → predicate_id as string instead of IRI
+#   4. mapping_bad_004 → object is an ESCO occupation on a HubMapping
+#   5. mapping_bad_005 → confidence 1.4, outside the range 0.0 to 1.0
+#   6. concept_bad_006 → integrationStrategy pending, not in vocabulary
+# =====================================================================
+
+@prefix harm:        <http://hr-qde.org/harmonised/> .
+@prefix esco-skill:  <http://data.europa.eu/esco/skill/> .
+@prefix esco-occ:    <http://data.europa.eu/esco/occupation/> .
+@prefix sssom:       <https://w3id.org/sssom/> .
+@prefix semapv:      <https://w3id.org/semapv/vocab/> .
+@prefix skos:        <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+
+# 1 — harmonisation annotation stamped onto an ESCO node
+esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d
+  a                          harm:HarmonisedConcept ;
+  harm:derivedFrom           harm:kqr_esco ;
+  harm:sourceIdentifier      "ccd0a1d9" ;
+  skos:prefLabel             "Computer Programming"@en .
+
+# 2 — derivedFrom as a string literal
+harm:concept_bad_002
+  a                          skos:Concept ;
+  harm:derivedFrom           "ecf" ;
+  harm:sourceIdentifier      "B.2" ;
+  skos:prefLabel             "Component Integration"@en .
+
+# 3 — predicate_id as a string
+harm:mapping_bad_003
+  a                          harm:HubMapping ;
+  sssom:subject_id           harm:concept_bad_002 ;
+  sssom:object_id            esco-skill:11430d93-c835-48ed-8e70-285fa69c9ae6 ;
+  sssom:predicate_id         "skos:broadMatch" ;
+  sssom:mapping_confidence   "0.71"^^xsd:decimal ;
+  sssom:mapping_justification semapv:LexicalMatching ;
+  sssom:mapping_tool         "HR-QDE-Harmonizer v0.1" .
+
+# 4 — HubMapping pointing at an occupation instead of a skill
+harm:mapping_bad_004
+  a                          harm:HubMapping ;
+  sssom:subject_id           harm:concept_bad_002 ;
+  sssom:object_id            esco-occ:bd272aee-adc9-4a06-a15c-a73b4b4a46a7 ;
+  sssom:predicate_id         skos:broadMatch ;
+  sssom:mapping_confidence   "0.89"^^xsd:decimal ;
+  sssom:mapping_justification semapv:LexicalMatching ;
+  sssom:mapping_tool         "HR-QDE-Harmonizer v0.1" .
+
+# 5 — confidence outside the admissible range
+harm:mapping_bad_005
+  a                          harm:HubMapping ;
+  sssom:subject_id           harm:concept_bad_002 ;
+  sssom:object_id            esco-skill:19a8293b-8e95-4de3-983f-77484079c389 ;
+  sssom:predicate_id         skos:relatedMatch ;
+  sssom:mapping_confidence   "1.4"^^xsd:decimal ;
+  sssom:mapping_justification semapv:LexicalMatching ;
+  sssom:mapping_tool         "HR-QDE-Harmonizer v0.1" .
+
+# 6 — disjoint concept left pending
+harm:concept_bad_006
+  a                          harm:HarmonisedConcept ;
+  harm:derivedFrom           harm:kqr_dqr ;
+  harm:sourceIdentifier      "Selbstaendigkeit N6" ;
+  harm:integrationStrategy   "pending" ;
+  skos:prefLabel             "Autonomy, Level 6"@en ;
+  rdfs:comment               "No ESCO counterpart identified."@en .

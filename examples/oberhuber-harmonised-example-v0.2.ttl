@@ -1,0 +1,121 @@
+# =====================================================================
+# Example Delivery — Säule D (Oberhuber) · Harmonisation Layer
+# Version 0.2  ·  2026-08-06
+#
+# Conformant delivery demonstrating the three result types of the
+# Säule-D pipeline, corrected against mini-artefakt v0.1:
+#
+#   1. Hub mapping    — an e-CF competence onto an ESCO skill
+#   2. Level mapping  — referencing the skeleton level vocabulary
+#   3. Disjoint       — a DQR category without an ESCO anchor
+#
+# Changes against v0.1
+# --------------------
+#   - prefix harm: instead of hrqde: (hrqde: is bound to
+#     http://hr-qde.org/ontology/ in the graph)
+#   - derivedFrom as IRI instead of string literal
+#   - SSSOM records typed as Mapping subclasses, not as MappingSet
+#   - predicate_id as IRI instead of the string skos:broadMatch
+#   - object of the hub mapping is an ESCO skill, not an occupation
+#   - level mapping references hrqde:DQR6 and eqf:6 instead of
+#     minting parallel URIs at data.bmbf.de and snb/eqf
+#   - ESCO nodes carry no harmonisation annotations
+#   - integrationStrategy stated instead of left pending
+#   - ontology metadata machine readable instead of comment only
+# =====================================================================
+
+@prefix harm:        <http://hr-qde.org/harmonised/> .
+@prefix harm-ecf:    <http://hr-qde.org/harmonised/source/ecf/> .
+@prefix harm-dqr:    <http://hr-qde.org/harmonised/source/dqr/> .
+@prefix harm-map:    <http://hr-qde.org/harmonised/mapping/> .
+@prefix harm-cl:     <http://hr-qde.org/harmonised/cluster/> .
+@prefix hrqde:       <http://hr-qde.org/ontology/> .
+@prefix esco-skill:  <http://data.europa.eu/esco/skill/> .
+@prefix eqf:         <http://data.europa.eu/snb/qf-eu-level/> .
+@prefix sssom:       <https://w3id.org/sssom/> .
+@prefix semapv:      <https://w3id.org/semapv/vocab/> .
+@prefix skos:        <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl:         <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms:     <http://purl.org/dc/terms/> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+
+# Delivery metadata ===================================================
+
+<http://hr-qde.org/harmonised/delivery/v0.2>
+  a                          owl:Ontology ;
+  dcterms:title              "HR-QDE Säule D — example delivery"@en ;
+  dcterms:creator            "Oberhuber" ;
+  dcterms:created            "2026-08-06"^^xsd:date ;
+  owl:versionInfo            "0.2" ;
+  dcterms:source             "ESCO v1.2.1" , "e-CF 3.0" , "EQF 2017" , "DQR 2013" ;
+  rdfs:comment               "Scope: ICT corridor. Produced by HR-QDE-Harmonizer v0.1."@en .
+
+
+# Scenario 1 — hub mapping ============================================
+# e-CF B.1 Application Development onto the ESCO skill that Säule B
+# already references from its learning outcomes.
+
+harm-ecf:B.1
+  a                          skos:Concept ;
+  harm:derivedFrom           harm:kqr_ecf ;
+  harm:sourceIdentifier      "B.1" ;
+  skos:prefLabel             "Application Development"@en ,
+                             "Anwendungsentwicklung"@de ;
+  rdfs:comment               "e-CF dimension 2 competence in the BUILD area."@en .
+
+harm-ecf:B.1
+  skos:broadMatch            esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d .
+
+harm-map:m1
+  a                          harm:HubMapping ;
+  sssom:subject_id           harm-ecf:B.1 ;
+  sssom:object_id            esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d ;
+  sssom:predicate_id         skos:broadMatch ;
+  sssom:mapping_confidence   "0.89"^^xsd:decimal ;
+  sssom:mapping_justification semapv:LexicalMatching ;
+  sssom:mapping_tool         "HR-QDE-Harmonizer v0.1" ;
+  sssom:comment              "Threefold LLM classification, agreement in three of three runs."@en .
+
+
+# Scenario 2 — level mapping ==========================================
+# The correspondence is normative and already asserted in the skeleton
+# ontology. Restated here as an explicit provenance record, using the
+# canonical URIs rather than newly minted ones.
+
+harm-map:m2
+  a                          harm:LevelMapping ;
+  sssom:subject_id           hrqde:DQR6 ;
+  sssom:object_id            eqf:6 ;
+  sssom:predicate_id         skos:exactMatch ;
+  sssom:mapping_confidence   "1.0"^^xsd:decimal ;
+  sssom:mapping_justification semapv:ManualMappingCuration ;
+  sssom:mapping_tool         "HR-QDE-Harmonizer v0.1" ;
+  sssom:comment              "Normative cross reference from the German EQF Referencing Report 2012 and 2013."@en .
+
+
+# Scenario 3 — disjoint concept =======================================
+# A DQR competence category with no ESCO counterpart. FF3 of the
+# Säule-D thesis. A strategy is stated, not left pending.
+
+harm-dqr:sozialkompetenz_n6
+  a                          harm:HarmonisedConcept ;
+  harm:derivedFrom           harm:kqr_dqr ;
+  harm:sourceIdentifier      "Sozialkompetenz N6" ;
+  harm:integrationStrategy   "own_class" ;
+  skos:prefLabel             "Social Competence, Level 6"@en ,
+                             "Sozialkompetenz, Niveau 6"@de ;
+  rdfs:comment               "The DQR models social competence as a separate dimension of the competence matrix. ESCO has transversal skills, but none that carries the DQR level semantics. Carried into the graph as an own class of the harmonisation layer."@en ,
+                             "Der DQR führt Sozialkompetenz als eigene Dimension der Kompetenzmatrix. ESCO kennt transversale Kompetenzen, aber keine, die die DQR-Niveausemantik trägt. Wird als eigene Klasse der Harmonisierungsschicht in den Graphen übernommen."@de .
+
+
+# Cluster =============================================================
+# An individual, not an owl:Class, so that membership stays in OWL DL.
+
+harm-cl:software_engineering
+  a                          harm:HarmonisedCluster ;
+  skos:prefLabel             "Software Engineering"@en ,
+                             "Softwaretechnik"@de ;
+  harm:harmonises             harm-ecf:B.1 ,
+                             esco-skill:ccd0a1d9-afda-43d9-b901-96344886e14d .
