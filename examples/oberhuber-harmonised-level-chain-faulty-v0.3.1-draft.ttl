@@ -1,0 +1,19 @@
+# Deliberately invalid: the hasLevel target lacks rdf:type harm:LevelConcept.
+
+@prefix harm:     <http://hr-qde.org/harmonised/> .
+@prefix harm-ecf: <http://hr-qde.org/harmonised/source/ecf/> .
+@prefix hrqde:    <http://hr-qde.org/ontology/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+
+harm-ecf:A.1
+  a                     skos:Concept , harm:CompetenceConcept ;
+  harm:derivedFrom      harm:kqr_ecf ;
+  harm:sourceIdentifier "A.1" ;
+  skos:prefLabel        "IS and Business Strategy Alignment"@en ;
+  harm:hasLevel         harm-ecf:A.1.Niveau4 .
+
+harm-ecf:A.1.Niveau4
+  a                     skos:Concept ;
+  harm:derivedFrom      harm:kqr_ecf ;
+  harm:sourceIdentifier "A.1 Niveau 4" ;
+  skos:prefLabel        "A.1 proficiency level 4"@en .

@@ -1,6 +1,6 @@
 # =====================================================================
 # HR-QDE Harmonisation Schema — Säule D
-# Version 0.3.0  ·  2026-09-06
+# Version 0.3.1-draft  ·  2026-09-06
 #
 # Formalises the base ontology designed in the Säule-D thesis
 # (Oberhuber, MA v0.61, Tabelle 3.13 and Tabelle 3.14). Class and
@@ -46,9 +46,18 @@
 #     proficiency level descriptions (dimension 3). Closes the gap
 #     between the competence layer (ESCO hub) and the level layer (DQR
 #     anchor), which were otherwise disjoint components.
-#   - harm:CompetenceConcept and harm:LevelConcept added as optional
-#     subclasses of skos:Concept. Declared but not enforced by the
-#     shapes, so existing deliveries stay valid.
+#   - harm:CompetenceConcept and harm:LevelConcept added as subclasses
+#     of skos:Concept.
+#
+# Changes against 0.3.0
+# ---------------------
+#   - harm:hasLevel now has the role-specific signature
+#     CompetenceConcept -> LevelConcept. The roles are asserted with
+#     rdf:type, rather than with the undocumented and semantically
+#     different harm:conceptRole predicate.
+#   - e-CF dimension-3 descriptions are connected to DQR anchors by
+#     harm:LevelMapping. A harm:HubMapping is exclusively a mapping to
+#     an ESCO skill and must never be used for that level crosswalk.
 # =====================================================================
 
 @prefix harm:     <http://hr-qde.org/harmonised/> .
@@ -71,7 +80,7 @@ harm:
   dcterms:creator   "Adrian Vogler" ;
   dcterms:created   "2026-08-06"^^xsd:date ;
   dcterms:modified  "2026-09-06"^^xsd:date ;
-  owl:versionInfo   "0.3.0" ;
+  owl:versionInfo   "0.3.1-draft" ;
   dcterms:source    "Oberhuber, Vergleichende Analyse von Kompetenz-Referenzrahmen, MA v0.61, Tabelle 3.13 und 3.14" ;
   rdfs:comment      "Vocabulary of the Säule-D harmonisation layer of the HR-QDE domain ontology."@en .
 
@@ -125,11 +134,12 @@ harm:HarmonisedConcept
                     "Eigenständige Klasse für ein Konzept ohne Entsprechung in einem anderen integrierten Referenzrahmen. Dies ist der disjunkte Fall, nicht der Regelfall: Ein Konzept, das auf ESCO abgebildet werden kann, bleibt ein einfaches skos:Concept mit harm:derivedFrom. Jede Instanz benötigt eine Integrationsstrategie."@de .
 
 
-# Concept roles (optional, declared in 0.3.0) =========================
-# Distinguishing competence concepts from level concepts lets
-# harm:hasLevel carry a meaningful domain and range. Optional for now:
-# the shapes do not require the typing, so deliveries that use plain
-# skos:Concept remain valid.
+# Concept roles =======================================================
+# The role is represented by rdf:type. In particular, do not encode a
+# role as ``harm:conceptRole harm:LevelConcept``: that predicate is not
+# part of this vocabulary and treats the class IRI as a property value.
+# A delivery using harm:hasLevel must assert both role types explicitly,
+# because SHACL validation deliberately runs without RDFS inference.
 
 harm:CompetenceConcept
   a                 owl:Class ;
@@ -207,10 +217,10 @@ harm:integrationStrategy
 harm:hasLevel
   a                 owl:ObjectProperty ;
   rdfs:label        "has level"@en , "hat Niveau"@de ;
-  rdfs:domain       skos:Concept ;
-  rdfs:range        skos:Concept ;
-  rdfs:comment      "Links a competence concept to the level descriptions that qualify it. Introduced for e-CF dimension 3: the proficiency descriptions of a competence are formalised as concepts in their own right and classified against DQR by the regular pipeline, which connects the competence layer to the level layer without a hardwired crosswalk. Domain and range stay skos:Concept while harm:CompetenceConcept and harm:LevelConcept are optional; they can be narrowed once the typing is enforced."@en ,
-                    "Verbindet ein Kompetenzkonzept mit den Niveaubeschreibungen, die es qualifizieren. Eingeführt für e-CF Dimension 3: Die Proficiency-Beschreibungen einer Kompetenz werden als eigenständige Konzepte formalisiert und regulär gegen DQR klassifiziert, wodurch die Kompetenzschicht ohne hartverdrahteten Crosswalk an die Niveauschicht anschließt."@de .
+  rdfs:domain       harm:CompetenceConcept ;
+  rdfs:range        harm:LevelConcept ;
+  rdfs:comment      "Links a competence concept to the level descriptions that qualify it. Introduced for e-CF dimension 3: every proficiency description is a LevelConcept in its own right. Its normative crosswalk to a DQR anchor is a LevelMapping, normally with skos:closeMatch and ManualMappingCuration. It is not a HubMapping: hub mappings exclusively target ESCO skills and provide the cross-pillar coverage join."@en ,
+                    "Verbindet ein Kompetenzkonzept mit den Niveaubeschreibungen, die es qualifizieren. Für e-CF Dimension 3 ist jede Proficiency-Beschreibung ein eigenständiges LevelConcept. Ihr normativer Crosswalk auf einen DQR-Anker ist ein LevelMapping, üblicherweise mit skos:closeMatch und ManualMappingCuration. Er ist kein HubMapping: HubMappings zielen ausschließlich auf ESCO-Skills und bilden den Coverage-Join zwischen den Säulen."@de .
 
 harm:justification
   a                 owl:DatatypeProperty ;

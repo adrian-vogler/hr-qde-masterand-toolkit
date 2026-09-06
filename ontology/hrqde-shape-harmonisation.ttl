@@ -1,6 +1,6 @@
 # =====================================================================
 # HR-QDE SHACL Shapes — Säule D (Harmonisation Layer)
-# Version 0.3.0  ·  2026-09-06
+# Version 0.3.1-draft  ·  2026-09-06
 #
 # Shape module for the harmonisation layer. Intended to be merged into
 # hrqde-shapes-all.ttl (then v0.3.0), because
@@ -28,6 +28,13 @@
 # three data pillars meet on the skill layer (targetsCompetence,
 # refersToCompetence, acquiredCompetenceOf). Occupations carry a single
 # edge in the entire graph and that one comes from a toolkit example.
+#
+# Changes against 0.3.0
+# ---------------------
+# hasLevel is now role-checked. Its source must be a
+# harm:CompetenceConcept and each target a harm:LevelConcept. The
+# resulting e-CF-dimension-3-to-DQR record is a LevelMapping, not a
+# HubMapping; the latter keeps its ESCO-skill-only object constraint.
 # =====================================================================
 
 @prefix harm:        <http://hr-qde.org/harmonised/> .
@@ -245,20 +252,25 @@ hrqde-shape:OccupationMappingShape
 
 
 # Proficiency levels (harm:hasLevel) ==================================
-# Every subject of harm:hasLevel must point at a concept of the
-# harmonisation layer. Without this, an undeclared property would pass
-# silently: SHACL ignores properties no shape targets.
+# Role types are required explicitly. validate.py and n10s do not use
+# RDFS inference, so the schema's rdfs:domain/rdfs:range alone cannot
+# establish the contract. This shape is evaluated against the ontology
+# artefact, where both endpoint concepts are present.
 
 hrqde-shape:HasLevelShape
   a                 sh:NodeShape ;
   sh:targetSubjectsOf harm:hasLevel ;
+  sh:class          harm:CompetenceConcept ;
+  sh:message        "The subject of harm:hasLevel must be explicitly typed harm:CompetenceConcept."@en ,
+                    "Das Subjekt von harm:hasLevel muss explizit als harm:CompetenceConcept typisiert sein."@de ;
   sh:property [
     sh:path         harm:hasLevel ;
     sh:minCount     1 ;
     sh:nodeKind     sh:IRI ;
     sh:pattern      "^http://hr-qde\\.org/harmonised/" ;
-    sh:message      "The object of harm:hasLevel must be a level concept of the harmonisation layer. Level descriptions are formalised as concepts of their own and classified by the pipeline, not referenced as arbitrary URIs."@en ,
-                    "Das Objekt von harm:hasLevel muss ein Niveaukonzept der Harmonisierungsschicht sein. Niveaubeschreibungen werden als eigenstaendige Konzepte formalisiert und von der Pipeline klassifiziert, nicht als beliebige URIs referenziert."@de ;
+    sh:class         harm:LevelConcept ;
+    sh:message      "The object of harm:hasLevel must be explicitly typed harm:LevelConcept under the harmonisation namespace. Its normative DQR crosswalk is serialized as a LevelMapping, not as a HubMapping."@en ,
+                    "Das Objekt von harm:hasLevel muss im Harmonisierungs-Namensraum explizit als harm:LevelConcept typisiert sein. Sein normativer DQR-Crosswalk wird als LevelMapping, nicht als HubMapping serialisiert."@de ;
   ] .
 
 

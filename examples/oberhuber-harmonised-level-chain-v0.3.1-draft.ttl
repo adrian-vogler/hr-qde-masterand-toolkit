@@ -1,0 +1,34 @@
+# =====================================================================
+# Conformant Säule-D level-chain example · schema/shapes v0.3.1-draft
+# =====================================================================
+
+@prefix harm:     <http://hr-qde.org/harmonised/> .
+@prefix harm-ecf: <http://hr-qde.org/harmonised/source/ecf/> .
+@prefix harm-map: <http://hr-qde.org/harmonised/mapping/> .
+@prefix hrqde:    <http://hr-qde.org/ontology/> .
+@prefix sssom:    <https://w3id.org/sssom/> .
+@prefix semapv:   <https://w3id.org/semapv/vocab/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+harm-ecf:A.1
+  a                     skos:Concept , harm:CompetenceConcept ;
+  harm:derivedFrom      harm:kqr_ecf ;
+  harm:sourceIdentifier "A.1" ;
+  skos:prefLabel        "IS and Business Strategy Alignment"@en ;
+  harm:hasLevel         harm-ecf:A.1.Niveau4 .
+
+harm-ecf:A.1.Niveau4
+  a                     skos:Concept , harm:LevelConcept ;
+  harm:derivedFrom      harm:kqr_ecf ;
+  harm:sourceIdentifier "A.1 Niveau 4" ;
+  skos:prefLabel        "A.1 proficiency level 4"@en .
+
+harm-map:ecf_A1_niveau4_to_dqr7
+  a                            harm:LevelMapping ;
+  sssom:subject_id             harm-ecf:A.1.Niveau4 ;
+  sssom:object_id              hrqde:DQR7 ;
+  sssom:predicate_id           skos:closeMatch ;
+  sssom:mapping_confidence     "1.0"^^xsd:decimal ;
+  sssom:mapping_justification  semapv:ManualMappingCuration ;
+  sssom:mapping_tool           "CEN EN 16234-1 Annex 2" .
