@@ -1,6 +1,6 @@
 # =====================================================================
 # HR-QDE SHACL Shapes — Säule D (Harmonisation Layer)
-# Version 0.2.0  ·  2026-08-06
+# Version 0.3.0  ·  2026-09-06
 #
 # Shape module for the harmonisation layer. Intended to be merged into
 # hrqde-shapes-all.ttl (then v0.3.0), because
@@ -112,11 +112,12 @@ hrqde-shape:HarmonisedClusterShape
     sh:message      "A cluster must harmonise at least two concepts, otherwise it asserts nothing."@en ,
                     "Ein Cluster muss mindestens zwei Konzepte harmonisieren, sonst behauptet es nichts."@de ;
   ] ;
-  sh:property [
-    sh:path         skos:prefLabel ;
-    sh:minCount     1 ;
-    sh:uniqueLang   true ;
-  ] .
+  sh:or (
+    [ sh:property [ sh:path skos:prefLabel ; sh:minCount 1 ; sh:uniqueLang true ] ]
+    [ sh:property [ sh:path rdfs:label     ; sh:minCount 1 ; sh:uniqueLang true ] ]
+  ) ;
+  sh:message        "A cluster must carry a name, either as skos:prefLabel or as rdfs:label, at most one per language."@en ,
+                    "Ein Cluster muss einen Namen tragen, entweder als skos:prefLabel oder als rdfs:label, je Sprache hoechstens einen."@de .
 
 
 # Mappings, common constraints ========================================
@@ -168,9 +169,9 @@ hrqde-shape:MappingShape
     sh:minCount     1 ;
     sh:maxCount     1 ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^https://w3id\\.org/semapv/" ;
-    sh:message      "Mapping must state a justification from the SEMAPV vocabulary as an IRI, per section 2.2.2 of the thesis. The slot match_type is not used."@en ,
-                    "Mapping muss eine Justification aus dem SEMAPV-Vokabular als IRI angeben, gemäß Abschnitt 2.2.2 der Arbeit. Der Slot match_type wird nicht verwendet."@de ;
+    sh:pattern      "^https://w3id\\.org/semapv/vocab/(MappingReview|ManualMappingCuration|LogicalReasoning|LexicalMatching|CompositeMatching|UnspecifiedMatching|SemanticSimilarityThresholdMatching|LexicalSimilarityThresholdMatching|MappingChaining|MappingInversion|StructuralMatching|InstanceBasedMatching|BackgroundKnowledgeBasedMatching)$" ;
+    sh:message      "Mapping justification must be one of the terms SSSOM enumerates for mapping_justification, given as a SEMAPV IRI. Invented terms such as LLMBasedMatching are outside the enumeration; CompositeMatching or BackgroundKnowledgeBasedMatching are the closest fit for an LLM classification. The slot match_type is not used."@en ,
+                    "Die Justification muss einer der Terme sein, die SSSOM fuer mapping_justification vorgibt, angegeben als SEMAPV-IRI. Erfundene Terme wie LLMBasedMatching liegen ausserhalb der Liste; fuer eine LLM-Klassifikation kommen CompositeMatching oder BackgroundKnowledgeBasedMatching am ehesten in Frage. Der Slot match_type wird nicht verwendet."@de ;
   ] ;
   sh:property [
     sh:path         sssom:mapping_tool ;
@@ -209,16 +210,16 @@ hrqde-shape:LevelMappingShape
   sh:property [
     sh:path         sssom:subject_id ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^(http://hr-qde\\.org/ontology/DQR[1-8]|http://data\\.europa\\.eu/snb/qf-eu-level/[1-8])$" ;
-    sh:message      "LevelMapping subject must be a level of the HR-QDE skeleton (hrqde:DQR1 to DQR8) or an EQF authority URI under data.europa.eu/snb/qf-eu-level/. Parallel level vocabularies join with nothing."@en ,
-                    "LevelMapping-Subjekt muss ein Niveau des HR-QDE-Skeletts (hrqde:DQR1 bis DQR8) oder eine EQF-Autoritaets-URI sein. Parallele Niveau-Vokabulare verbinden sich mit nichts."@de ;
+    sh:pattern      "^(http://hr-qde\\.org/ontology/DQR[1-8]|http://data\\.europa\\.eu/snb/qf-eu-level/[1-8]|http://hr-qde\\.org/harmonised/)" ;
+    sh:message      "LevelMapping subject must be a top level anchor of the HR-QDE skeleton (hrqde:DQR1 to DQR8), an EQF authority URI, or a dimension concept of the harmonisation layer. Anchors are referenced, never minted anew."@en ,
+                    "LevelMapping-Subjekt muss ein Top-Level-Anker des HR-QDE-Skeletts (hrqde:DQR1 bis DQR8), eine EQF-Autoritaets-URI oder ein Dimensionskonzept der Harmonisierungsschicht sein. Anker werden referenziert, nicht neu gepraegt."@de ;
   ] ;
   sh:property [
     sh:path         sssom:object_id ;
     sh:nodeKind     sh:IRI ;
-    sh:pattern      "^(http://hr-qde\\.org/ontology/DQR[1-8]|http://data\\.europa\\.eu/snb/qf-eu-level/[1-8])$" ;
-    sh:message      "LevelMapping object must be a level of the HR-QDE skeleton or an EQF authority URI."@en ,
-                    "LevelMapping-Objekt muss ein Niveau des HR-QDE-Skeletts oder eine EQF-Autoritaets-URI sein."@de ;
+    sh:pattern      "^(http://hr-qde\\.org/ontology/DQR[1-8]|http://data\\.europa\\.eu/snb/qf-eu-level/[1-8]|http://hr-qde\\.org/harmonised/)" ;
+    sh:message      "LevelMapping object must be a top level anchor of the HR-QDE skeleton, an EQF authority URI, or a dimension concept of the harmonisation layer."@en ,
+                    "LevelMapping-Objekt muss ein Top-Level-Anker des HR-QDE-Skeletts, eine EQF-Autoritaets-URI oder ein Dimensionskonzept der Harmonisierungsschicht sein."@de ;
   ] .
 
 
@@ -240,6 +241,24 @@ hrqde-shape:OccupationMappingShape
     sh:minCount     1 ;
     sh:message      "OccupationMapping must state why a competence is related to an occupation rather than to a skill."@en ,
                     "OccupationMapping muss begründen, warum eine Kompetenz auf einen Beruf statt auf einen Skill bezogen wird."@de ;
+  ] .
+
+
+# Proficiency levels (harm:hasLevel) ==================================
+# Every subject of harm:hasLevel must point at a concept of the
+# harmonisation layer. Without this, an undeclared property would pass
+# silently: SHACL ignores properties no shape targets.
+
+hrqde-shape:HasLevelShape
+  a                 sh:NodeShape ;
+  sh:targetSubjectsOf harm:hasLevel ;
+  sh:property [
+    sh:path         harm:hasLevel ;
+    sh:minCount     1 ;
+    sh:nodeKind     sh:IRI ;
+    sh:pattern      "^http://hr-qde\\.org/harmonised/" ;
+    sh:message      "The object of harm:hasLevel must be a level concept of the harmonisation layer. Level descriptions are formalised as concepts of their own and classified by the pipeline, not referenced as arbitrary URIs."@en ,
+                    "Das Objekt von harm:hasLevel muss ein Niveaukonzept der Harmonisierungsschicht sein. Niveaubeschreibungen werden als eigenstaendige Konzepte formalisiert und von der Pipeline klassifiziert, nicht als beliebige URIs referenziert."@de ;
   ] .
 
 
